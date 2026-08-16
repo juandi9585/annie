@@ -19,6 +19,12 @@
 (function () {
   'use strict';
 
+  /* --- desactivar restauración de scroll al recargar --------------------- */
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+
   /* --- lo que hay que tocar para cambiar el ritmo -------------------------- */
 
   var TOQUES_POR_FASE = 3;   // 3 fases x 3 toques + el estallido final = 10
