@@ -9,13 +9,18 @@ No hay build, ni dependencias, ni npm. Son cinco archivos y se despliegan tal cu
 
 Destino: <https://juandi9585.github.io/annie>
 
-## Pendiente antes de publicar
+## El tramo útil de la animación
 
-**Cambiar la flor.** `assets/flower.json` es un marcador generado para esta
-página; la flor de verdad tiene que salir de LottieFiles. Ver más abajo.
+`app.js` **no recorre el timeline entero**, sino el tramo `FRAME_FROM` →
+`FRAME_TO` (ahora `0.30` → `0.88`).
 
-Hazlo **antes** de desplegar: al cambiarla hay que regenerar
-`assets/preview.png`, que es la imagen de la tarjeta del enlace.
+La animación actual crece desde una mota invisible y se queda quieta antes del
+final. Sin recortar, la página abriría con la pantalla prácticamente vacía —
+nada que tocar — y el último tercio del gesto no movería nada.
+
+Si cambias de animación, revisa esos dos números con `tools/frames.html`
+(instrucciones dentro). Y ajusta también el zoom de `tools/preview.html`, que
+está encuadrado a mano sobre la flor de ahora.
 
 ---
 
@@ -27,18 +32,18 @@ Hazlo **antes** de desplegar: al cambiarla hay que regenerar
    [rose-flower](https://lottiefiles.com/free-animations/rose-flower)
 
 2. **No sirve cualquier flor.** La interacción recorre el timeline a mano, así que
-   la animación tiene que ser una floración lineal: frame 0 cerrado, último frame
-   abierto. Compruébalo arrastrando el scrubber del preview en LottieFiles — si al
-   arrastrar de izquierda a derecha la flor se abre, sirve. Si gira en bucle,
-   rebota, o ya empieza abierta, no.
+   tiene que ser una progresión lineal de menos a más. Compruébalo arrastrando el
+   scrubber del preview en LottieFiles: si al arrastrar de izquierda a derecha la
+   flor se abre o crece, sirve. Si gira en bucle o rebota, no.
 
 3. Descarga en **Lottie JSON** (no `.lottie`, no GIF) y guárdalo como
    `assets/flower.json`.
 
-4. Regenera la imagen del preview (ver abajo) y rellena `CREDITS.md`.
+4. Abre `tools/frames.html` y elige `FRAME_FROM` / `FRAME_TO` en `app.js`. Casi
+   ninguna animación aprovecha su timeline entero: suelen empezar en vacío y
+   terminar quietas.
 
-Si la animación tiene una cola de "idle" al final, no hace falta descartarla: se
-puede acotar el rango en `app.js`, en la función `seek()`.
+5. Regenera `assets/preview.png` (ver abajo) y rellena `CREDITS.md`.
 
 ## Cambiar el mensaje
 

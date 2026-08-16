@@ -2,16 +2,16 @@
 
 ## Animación de la flor — `assets/flower.json`
 
-> **PENDIENTE DE SUSTITUIR.** Ahora mismo contiene una floración de marcador
-> generada para esta página. Sirve para probar la interacción, pero la flor
-> definitiva debe venir de LottieFiles.
->
-> Al reemplazarla, rellena estos campos y borra este aviso:
->
-> - **Título:** …
-> - **Autor/a:** …
-> - **URL:** …
-> - **Licencia:** Lottie Simple License (FL 9.13.21)
+- **Título del archivo:** "Flower growing Lottie JSON animation2"
+- **Origen:** LottieFiles, sección de animaciones gratuitas
+- **Autor/a:** *pendiente* — anotar aquí el nombre que aparece en la página de
+  la animación
+- **URL:** *pendiente* — el enlace de la animación en lottiefiles.com
+- **Licencia:** Lottie Simple License (FL 9.13.21)
+- **Formato:** 1000×1000, 30 fps, 60 frames, sin imágenes externas embebidas
+
+La página usa el tramo `0.30`–`0.88` de su timeline, no la animación completa
+(ver README).
 
 Las animaciones gratuitas de LottieFiles se publican bajo la
 [Lottie Simple License (FL 9.13.21)](https://lottiefiles.com/page/license), que

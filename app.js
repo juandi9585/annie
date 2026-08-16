@@ -8,6 +8,14 @@
 (function () {
   'use strict';
 
+  /* Tramo útil del Lottie. La animación elegida crece desde una mota
+     invisible y se queda quieta antes del final, así que recortamos por los
+     dos extremos: por debajo de FROM no hay nada que tocar, y por encima de
+     TO la flor ya no cambia y el tween gastaría tiempo en nada.
+     Al cambiar de animación, revisa estos dos números con tools/frames.html. */
+  var FRAME_FROM   = 0.30;
+  var FRAME_TO     = 0.88;
+
   var BLOOM_MS     = 2400;   // duración de la floración
   var REVEAL_AT    = 0.70;   // progreso al que entra el mensaje (solapado, no después)
   var SETTLE_MAX   = 0.014;  // amplitud del asentamiento final
@@ -73,8 +81,10 @@
     return Math.max(0, anim.totalFrames - 1);
   }
 
+  // p va de 0 a 1 y se reparte sobre el tramo útil, no sobre el timeline entero.
   function seek(p) {
-    anim.goToAndStop(p * lastFrame(), true);
+    var q = FRAME_FROM + p * (FRAME_TO - FRAME_FROM);
+    anim.goToAndStop(q * lastFrame(), true);
   }
 
   /* --- respiración del capullo -------------------------------------------- */

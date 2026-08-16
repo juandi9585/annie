@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tira de fotogramas</title>
+<!--
+  Página auxiliar para inspeccionar el timeline de una animación Lottie.
+  NO forma parte de la página que ve Annie.
+
+  Sirve para dos cosas al cambiar la flor:
+    1. Comprobar que el timeline sea una floración/crecimiento lineal.
+    2. Elegir FRAME_FROM y FRAME_TO en app.js — muchas animaciones empiezan
+       vacías y se quedan quietas antes del final, y ese tiempo hay que
+       recortarlo o la interacción se siente muerta por los extremos.
+
+  Uso — desde la raíz del proyecto:
+    python -m http.server 8000
+    y abrir http://127.0.0.1:8000/tools/frames.html
+    Parámetros opcionales:
+      ?s=0,0.25,0.5,0.75,1     los puntos a mostrar
+      &f=../assets/otra.json   otro archivo
+-->
+<style>
+  html, body { margin: 0; background: #faf7f2; }
+  body { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 12px;
+         font: 12px/1 system-ui, sans-serif; color: #8a8078; }
+  figure { margin: 0; text-align: center; }
+  .box { width: 220px; height: 220px; outline: 1px solid #e6e0d8; }
+  .box svg { display: block; width: 100%; height: 100%; }
+  figcaption { padding-top: 6px; }
+</style>
+</head>
+<body>
+<script src="../vendor/lottie.min.js"></script>
+<script>
+var q = new URLSearchParams(location.search);
+var file = q.get('f') || '../assets/flower.json';
+var stops = q.get('s') ? q.get('s').split(',').map(Number)
+                       : [0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.85, 1];
+
+fetch(file).then(function (r) { return r.json(); }).then(function (data) {
+  stops.forEach(function (p) {
+    var fig = document.createElement('figure');
+    var box = document.createElement('div');
+    box.className = 'box';
+    var cap = document.createElement('figcaption');
+    cap.textContent = 'p = ' + p;
+    fig.appendChild(box); fig.appendChild(cap);
+    document.body.appendChild(fig);
+
+    var anim = lottie.loadAnimation({
+      container: box, renderer: 'svg', loop: false, autoplay: false,
+      // copia por instancia: lottie-web muta el objeto que recibe
+      animationData: JSON.parse(JSON.stringify(data)),
+      rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+    });
+    anim.setSubframe(true);
+    anim.addEventListener('DOMLoaded', function () {
+      anim.goToAndStop(p * Math.max(0, anim.totalFrames - 1), true);
+    });
+  });
+});
+</script>
+</body>
+</html>
