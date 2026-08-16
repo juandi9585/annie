@@ -7,20 +7,15 @@ No hay build, ni dependencias, ni npm. Son cinco archivos y se despliegan tal cu
 
 ---
 
-## Pendientes antes de publicar
+Destino: <https://juandi9585.github.io/annie>
 
-**1. Cambiar la flor.** `assets/flower.json` es un marcador generado para esta
+## Pendiente antes de publicar
+
+**Cambiar la flor.** `assets/flower.json` es un marcador generado para esta
 página; la flor de verdad tiene que salir de LottieFiles. Ver más abajo.
 
-**2. Poner tu usuario de GitHub.** En `index.html` hay dos `REEMPLAZAR`:
-
-```html
-<meta property="og:image" content="https://REEMPLAZAR.github.io/annie/assets/preview.png">
-<meta property="og:url"   content="https://REEMPLAZAR.github.io/annie/">
-```
-
-Tienen que ser URLs **absolutas**: los scrapers de WhatsApp y Telegram no
-resuelven rutas relativas. Si no lo cambias, el enlace se comparte sin imagen.
+Hazlo **antes** de desplegar: al cambiarla hay que regenerar
+`assets/preview.png`, que es la imagen de la tarjeta del enlace.
 
 ---
 
@@ -96,14 +91,14 @@ gh repo create annie --public --source=. --push
 gh api -X POST repos/{owner}/annie/pages -f "source[branch]=main" -f "source[path]=/"
 ```
 
-Queda en `https://<usuario>.github.io/annie`. El repo se llama `annie` porque el
+Queda en <https://juandi9585.github.io/annie>. El repo se llama `annie` porque el
 nombre del repo *es* la URL.
 
 Dos avisos:
 
-- **Comprueba con qué cuenta estás**: `gh auth status`. Si es una cuenta de
-  trabajo, la URL lo delata — `gh auth login` y `gh auth switch` antes de crear
-  el repo.
+- **Comprueba la cuenta activa antes**: `gh auth status`. Tiene que ser
+  `juandi9585`; si no, `gh auth switch`. Las meta de `index.html` llevan ese
+  usuario escrito, así que publicar desde otra cuenta rompería el preview.
 - **El repo tiene que ser público** (Pages desde repo privado requiere GitHub
   Pro), o sea que el texto del mensaje queda legible en GitHub. Si eso molesta,
   la alternativa sin repo público es [Netlify Drop](https://app.netlify.com/drop):
