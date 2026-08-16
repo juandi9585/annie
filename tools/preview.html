@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Generador de assets/preview.png</title>
+<!--
+  Página auxiliar para regenerar la imagen del preview del enlace.
+  NO forma parte de la página que ve Annie.
+
+  Muestra el frame 0 de la flor (capullo cerrado) encuadrado a 1200x630, que es
+  el tamaño que esperan WhatsApp, Telegram y Twitter para og:image.
+
+  Uso — desde la raíz del proyecto:
+    python -m http.server 8000
+    chrome --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=8000 \
+           --window-size=1200,630 --screenshot=assets/preview.png \
+           http://127.0.0.1:8000/tools/preview.html
+
+  Vuelve a ejecutarlo cada vez que cambies assets/flower.json.
+-->
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { background: #faf7f2; display: grid; place-items: center; }
+
+  /* z-index: la viñeta es 'fixed', o sea posicionada, y sin esto se pinta
+     por encima de la flor y la lava en blanco. */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(110% 120% at 50% 42%,
+                rgba(255,255,255,.5) 0%, rgba(58,51,46,.06) 100%);
+  }
+
+  /* Se dimensiona por altura y el ancho lo da la proporción real del Lottie,
+     que el script lee del JSON. Así encuadra bien cualquier flor, alta o ancha. */
+  #art { position: relative; z-index: 1; height: 560px; aspect-ratio: var(--ar, 1); }
+  #art svg { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="art"></div>
+<script src="../vendor/lottie.min.js"></script>
+<script>
+fetch('../assets/flower.json').then(function (r) { return r.json(); }).then(function (data) {
+  var art = document.getElementById('art');
+  if (data.w && data.h) art.style.setProperty('--ar', (data.w / data.h).toFixed(4));
+
+  var anim = lottie.loadAnimation({
+    container: art,
+    renderer: 'svg', loop: false, autoplay: false, animationData: data,
+    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+  });
+  anim.addEventListener('DOMLoaded', function () { anim.goToAndStop(0, true); });
+});
+</script>
+</body>
+</html>

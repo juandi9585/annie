@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para Annie</title>
+
+<!-- El preview del enlace no revela el mensaje a propósito: si WhatsApp lo
+     mostrara en el chat, abrir la página ya no descubriría nada. -->
+<meta name="description" content="tócala.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Para Annie">
+<meta property="og:description" content="tócala.">
+<meta property="og:image" content="https://REEMPLAZAR.github.io/annie/assets/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://REEMPLAZAR.github.io/annie/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#faf7f2">
+
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="stage" id="stage">
+
+  <button class="bud" id="bud" type="button">
+    <span class="bud__art" id="art" aria-hidden="true"></span>
+    <span class="visually-hidden">Tocar para que la flor florezca</span>
+  </button>
+
+  <div class="reveal">
+    <p class="hint" id="hint" aria-hidden="true">tócala</p>
+
+    <div class="message" id="message" role="status">
+      <!-- MENSAJE — edita, quita o añade líneas aquí; se escalonan solas.
+           El &nbsp; impide que "10" quede huérfano al final de una línea. -->
+      <p>¡Felices 10&nbsp;meses, Annie!</p>
+      <!-- /MENSAJE -->
+    </div>
+  </div>
+
+</main>
+
+<script src="vendor/lottie.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
