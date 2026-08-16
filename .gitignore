@@ -1,3 +1,8 @@
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Originales sin procesar: llevan EXIF y GPS completos. tools/fotos.py los lee
+# de aquí y escribe las versiones publicables (sin metadatos) en assets/fotos/.
+assets/fotos-originales/
+.claude/

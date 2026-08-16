@@ -5,43 +5,172 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Para Annie</title>
 
-<!-- El preview del enlace no revela el mensaje a propósito: si WhatsApp lo
-     mostrara en el chat, abrir la página ya no descubriría nada. -->
+<!-- El preview del enlace no revela nada a propósito: si WhatsApp mostrara el
+     mensaje o las fotos en el chat, abrir la página ya no descubriría nada. -->
 <meta name="description" content="tócala.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Para Annie">
 <meta property="og:description" content="tócala.">
-<meta property="og:image" content="https://juandi9585.github.io/annie/assets/preview.png">
+<meta property="og:image" content="https://juandi9585.github.io/annie/assets/preview.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://juandi9585.github.io/annie/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#faf7f2">
+<meta name="theme-color" content="#a6cfe9">
 
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<!-- La tipografía es del propio dominio: precargarla evita que el mensaje
+     aparezca un instante con la serif del sistema y salte al asentarse. -->
+<link rel="preload" href="assets/fonts/fraunces-display.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/fraunces-texto.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<main class="stage" id="stage">
+<main class="escena" id="escena">
 
-  <button class="bud" id="bud" type="button">
-    <span class="bud__art" id="art" aria-hidden="true"></span>
-    <span class="visually-hidden">Tocar para que la flor florezca</span>
+  <!-- Cielo, sol, lomas y tierra: decoración pura, sin nada que leer ni tocar.
+       El sol va antes que la loma lejana porque tiene que quedar detrás. -->
+  <div class="sol" aria-hidden="true"></div>
+  <div class="loma loma--lejos" aria-hidden="true"></div>
+
+  <!-- La flor vive por debajo de la tierra en el orden de pintado: su base
+       queda oculta tras la loma cercana, así el tallo sale del suelo en vez
+       de estar apoyado encima. -->
+  <div class="flor" id="flor" aria-hidden="true"></div>
+
+  <div class="loma loma--cerca" aria-hidden="true"></div>
+  <div class="monticulo" id="monticulo" aria-hidden="true"></div>
+
+  <!-- La luz del suelo. Va suelta y no dentro del botón porque tiene que
+       seguir ahí cuando la semilla ya se ha hundido: a partir de la primera
+       foto, lo que se carga a cada toque es la tierra. -->
+  <div class="brillo" aria-hidden="true"></div>
+
+  <button class="semilla" id="semilla" type="button">
+    <span class="semilla__cuerpo" aria-hidden="true"></span>
+    <span class="visually-hidden">Tocar la semilla</span>
   </button>
 
-  <div class="reveal">
-    <p class="hint" id="hint" aria-hidden="true">tócala</p>
+  <!-- Toma el relevo cuando la semilla se hunde: a partir de ahí vale tocar
+       en cualquier parte de la pantalla. -->
+  <button class="toque" id="toque" type="button" hidden>
+    <span class="visually-hidden" id="toqueTexto">Tocar otra vez</span>
+  </button>
 
-    <div class="message" id="message" role="status">
-      <!-- MENSAJE — edita, quita o añade líneas aquí; se escalonan solas.
-           El &nbsp; impide que "10" quede huérfano al final de una línea. -->
-      <p>¡Felices 10&nbsp;meses, Annie!</p>
-      <!-- /MENSAJE -->
-    </div>
+  <p class="pista" id="pista" aria-hidden="true">tócala</p>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       LAS FOTOS QUE DISPARA LA SEMILLA.
+
+       Una por fase: salen de la tierra cada tres toques, en este orden. La
+       anterior se va cuando llega la siguiente, así que siempre hay una sola
+       en el cielo.
+
+       Para cambiarlas: pon otro archivo en data-foto. Si añades o quitas
+       <div class="recuerdo">, app.js se adapta solo — pero recuerda que el
+       número de fases (y por tanto de toques) sale de cuántos haya aquí.
+       ═══════════════════════════════════════════════════════════════════ -->
+
+  <div class="recuerdos" id="recuerdos" aria-hidden="true">
+    <div class="recuerdo" data-foto="assets/fotos/01-abrazo.webp"></div>
+    <div class="recuerdo" data-foto="assets/fotos/02-playa.webp"></div>
+    <div class="recuerdo" data-foto="assets/fotos/03-ramo.webp"></div>
   </div>
 
+  <!-- ══════════════════════════════════════════════════════════════════════
+       EL MENSAJE.  Es lo único de este archivo que hace falta tocar.
+
+       · titulo — corto. Es un grito, no una frase. Dos líneas como mucho.
+       · carta  — aquí caben dos o tres frases sin que se rompa nada: la flor
+                  se encoge sola para dejarles sitio (lo hace ajustarFlor()
+                  en app.js). Si te alargas mucho más, la flor toca su tamaño
+                  mínimo y el texto empieza a acercársele: esa es la señal de
+                  que el resto va en el jardín, no aquí.
+       · &nbsp; — espacio que no se parte. "10&nbsp;meses" evita que el 10 se
+                  quede solo al final de una línea. Úsalo donde te moleste el
+                  corte.
+       · Puedes añadir más párrafos <p class="carta">: entran escalonados,
+         uno detrás de otro, sin tocar CSS ni JS.
+       ═══════════════════════════════════════════════════════════════════ -->
+
+  <div class="mensaje" id="mensaje" role="status">
+
+    <p class="titulo">¡Felices 10&nbsp;meses, Annie!</p>
+
+    <p class="carta">Te adoro bebi, eres lo mejor que me ha pasado en la vida.</p>
+
+  </div>
+
+  <!-- ═══════════════════════════ fin del mensaje ══════════════════════ -->
+
+  <!-- Aparece cuando el mensaje ya está puesto, y sólo entonces se desbloquea
+       el scroll: hasta ese momento la página es una sola pantalla. -->
+  <a class="bajar" id="bajar" href="#jardin" hidden>
+    <span>hay más</span>
+    <span class="bajar__flecha" aria-hidden="true"></span>
+  </a>
+
 </main>
+
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     EL JARDÍN.  La segunda pantalla, bajo tierra: lo que hay debajo de la
+     flor son los recuerdos que la alimentaron.
+
+     Para cambiar las fotos: edita esta lista. Cada una necesita las dos
+     versiones que genera tools/fotos.py — la -mini para la rejilla y la
+     grande en data-grande, que sólo se descarga si Annie la toca.
+     ════════════════════════════════════════════════════════════════════ -->
+
+<!-- inert además de aria-hidden: aria-hidden no impide tabular hasta las
+     fotos, e ir a parar con el teclado a una pantalla que todavía no
+     existe sería un buen destrozo de la sorpresa. -->
+<section class="jardin" id="jardin" aria-hidden="true" inert>
+
+  <!-- Esta frase la escribí yo de relleno: cámbiala por la tuya. El <br>
+       fuerza el corte de línea donde quieras. -->
+  <p class="jardin__intro">Que emoción pensar en todas<br>las cosas divertidas que haremos juntos</p>
+
+  <!-- El orden importa en dos sitios: la primera abre (el ramo amarillo, que
+       rima con la flor de arriba) y la ÚLTIMA cierra — si son impares, la que
+       queda sola se centra y sale más grande. Por eso ahí va una buena. -->
+  <ul class="jardin__rejilla">
+    <li><button class="copia" type="button" data-grande="assets/fotos/03-ramo.webp">
+      <img src="assets/fotos/03-ramo-mini.webp" alt="Annie y yo con un ramo de flores amarillas" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/01-abrazo.webp">
+      <img src="assets/fotos/01-abrazo-mini.webp" alt="Annie y yo abrazados" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/02-playa.webp">
+      <img src="assets/fotos/02-playa-mini.webp" alt="Annie y yo en la playa" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/05-sushi.webp">
+      <img src="assets/fotos/05-sushi-mini.webp" alt="Annie y yo con una torre de sushi" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/06-gorros.webp">
+      <img src="assets/fotos/06-gorros-mini.webp" alt="Annie y yo con gorros de red" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/08-helados.webp">
+      <img src="assets/fotos/08-helados-mini.webp" alt="Annie y yo con helados" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/07-noche.webp">
+      <img src="assets/fotos/07-noche-mini.webp" alt="Annie y yo de noche" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/09-juntos.webp">
+      <img src="assets/fotos/09-juntos-mini.webp" alt="Annie y yo juntos" width="400" height="500" loading="lazy"></button></li>
+    <li><button class="copia" type="button" data-grande="assets/fotos/04-vestido.webp">
+      <img src="assets/fotos/04-vestido-mini.webp" alt="Annie y yo abrazados, ella de vestido lila" width="400" height="500" loading="lazy"></button></li>
+  </ul>
+
+</section>
+
+<!-- ═══════════════════════════ fin del jardín ═══════════════════════════ -->
+
+
+<!-- La foto a pantalla completa. Vacío hasta que Annie toca una copia. -->
+<div class="lupa" id="lupa" hidden>
+  <button class="lupa__cerrar" id="lupaCerrar" type="button">
+    <span class="visually-hidden">Cerrar la foto</span>
+  </button>
+  <img class="lupa__foto" id="lupaFoto" alt="">
+</div>
+
+<div class="grano" aria-hidden="true"></div>
 
 <script src="vendor/lottie.min.js"></script>
 <script src="app.js"></script>

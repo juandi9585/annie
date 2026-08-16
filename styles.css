@@ -1,66 +1,325 @@
 /* Una flor para Annie
-   Regla de diseño: la flor es lo grande, todo lo demás es pequeño y callado.
-   Un solo color de fondo, una sola familia tipográfica, cero adornos. */
+ *
+ * La escena es de papel recortado: cielo, una loma en bruma, tierra, y una
+ * semilla encima. Todo plano, sin sombras ni relieve, porque lo único que
+ * tiene volumen es la flor cuando sale.
+ *
+ * Regla de composición: la flor CRECE DESDE UN PUNTO (el Lottie escala desde
+ * el 54,2% / 88,3% de su lienzo). Ese punto es el ancla de toda la página: ahí
+ * está la semilla, ahí pasa la línea del horizonte y desde ahí se mide todo.
+ */
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Sin esto, el atributo hidden no sirve de nada aquí: .bajar y .lupa declaran
+   display:grid, y una clase propia le gana al display:none del navegador. El
+   jardín se abriría solo antes de tiempo. */
+[hidden] { display: none !important; }
+
 :root {
-  --paper:  #faf7f2;   /* blanco cálido de papel */
-  --ink:    #3a332e;   /* marrón muy oscuro, no negro */
-  --faint:  #a89e93;   /* para el 'tócala' */
-  --bloom-ms: 2400ms;
+  /* --- cielo, de arriba abajo --- */
+  --cielo-cenit:  #a6cfe9;   /* celeste pastel, lo más saturado de la página */
+  --cielo-medio:  #c3e0f2;
+  --cielo-bajo:   #e6f2f8;
+  --calor-rgb:  253, 242, 223;  /* el calor del horizonte. En componentes, no
+                                   en hex, porque el degradado lo necesita con
+                                   alfa y rgba() no acepta un hex de variable. */
+
+  /* --- tierra --- */
+  --bruma:        #b6d6ea;   /* loma lejana: azul de lejanía, no otro color */
+  --tierra:       #5d94b7;
+  --sol:          #fdeecb;
+
+  /* --- tinta y acento --- */
+  --tinta:        #21455f;
+  --sobre-tierra: #d9ecf7;   /* lo poco que se escribe sobre el suelo */
+  --miel-rgb:   232, 181, 63;   /* la semilla: el amarillo de la flor,
+                                   prometido antes de que exista */
+
+  /* --- geometría de la escena --- */
+  --eje:          50%;       /* la vertical donde se siembra: semilla, montículo
+                                y flor cuelgan de aquí. En pantalla ancha se
+                                descentra para que el mensaje tenga su propio
+                                sitio en vez de caer encima de la flor. */
+  --horizonte:    80%;       /* dónde cae la línea del suelo (y la semilla) */
+  --sol-x:        71%;       /* el sol nunca comparte vertical con el eje */
+
+  /* Dónde aterrizan las fotos que salen de la tierra. Es a propósito el mismo
+     sitio que ocupará luego el mensaje: los recuerdos ocupan el hueco donde
+     van a caer las palabras. */
+  --foto-x:       50%;
+  --foto-y:       42%;
+  /* Los tres limites que hacen falta, en una sola expresion: ancho de
+     pantalla, un tope absoluto, y el alto disponible (la foto es 4:5, asi que
+     su alto es el ancho por 1.25). En movil apaisado manda el tercero. */
+  --foto-ancho:   min(74vw, 310px, 48dvh);
+
+  --flor-alto:    68dvh;     /* alto del LIENZO del Lottie, no de la flor */
+  /* Cuánto puede sobresalir ese lienzo de la pantalla. Esta flor sólo ocupa
+     el 40% central de su lienzo cuadrado, así que limitarlo a 100vw la dejaba
+     diminuta. Si cambias de animación por una que llene su lienzo, baja esto. */
+  --flor-ancho:   150vw;
 }
 
-html, body { height: 100%; }
+/* Fraunces en sus DOS cortes ópticos, que es de donde le viene el carácter a
+   esta página: el mismo dibujo de letra afinado para dos tamaños distintos.
+
+     Display — opsz 144 / wght 600 / SOFT 100 / WONK 1. Contrastada y algo
+               torcida. Perfecta a 40 px, ilegible a 17.
+     Texto   — opsz 14 / wght 400 / SOFT 100 / WONK 0. Trazo más parejo y sin
+               las formas raras, que a tamaño de párrafo estorban.
+
+   Son instancias estáticas: se descargaron ya fijadas desde Google Fonts, así
+   que no llevan ejes variables y pesan 18 KB cada una en vez de 121.
+   Servidas desde el propio dominio, como lottie.min.js: la página no depende
+   de que un tercero siga sirviendo esa ruta dentro de unos años.
+   Cada latin-ext sólo se descarga si el texto llega a necesitarlo. */
+@font-face {
+  font-family: "Fraunces Display";
+  src: url("assets/fonts/fraunces-display.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces Display";
+  src: url("assets/fonts/fraunces-display-ext.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fraunces Texto";
+  src: url("assets/fonts/fraunces-texto.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces Texto";
+  src: url("assets/fonts/fraunces-texto-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+html { scroll-behavior: smooth; }
+html, body { min-height: 100%; }
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
-               Georgia, "Times New Roman", serif;
+  color: var(--tinta);
+  /* La pagina es UNA pantalla hasta que la flor sale. El jardin existe en el
+     HTML desde el principio pero queda recortado: hasta que no hay mensaje no
+     hay nada que buscar ahi abajo, y un scroll disponible antes de tiempo se
+     lleva por delante la sorpresa. app.js pone .is-abierto al terminar. */
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow: hidden;                 /* nunca hay scroll: todo cabe en pantalla */
+
+  /* El cielo va al fondo del body y no a una capa aparte: así cubre también el
+     rebote elástico de iOS.
+
+     Son dos capas. La de abajo es el degradado vertical del cielo. La de
+     arriba es el calor del horizonte, y va CENTRADA EN EL SOL en vez de ser
+     una banda de lado a lado: con la banda, al mover el sol la luz cálida se
+     quedaba en el lado contrario y la escena tenía dos soles contradictorios. */
+  background:
+    radial-gradient(74vw 40dvh at var(--sol-x) calc(var(--horizonte) - 4%),
+      rgba(var(--calor-rgb), .92) 0%,
+      rgba(var(--calor-rgb), 0)  70%) fixed,
+    linear-gradient(180deg,
+      var(--cielo-cenit) 0%,
+      var(--cielo-medio) 38%,
+      var(--cielo-bajo)  72%,
+      var(--cielo-bajo)  100%) fixed;
 }
 
-/* Viñeta casi imperceptible: da profundidad sin leerse como degradado.
-   z-index explícito en ambos: al ser 'fixed' esta capa es un elemento
-   posicionado y, sin esto, se pinta POR ENCIMA del contenido estático y
-   cubre la flor con un velo blanco del 55%. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(120% 90% at 50% 38%,
-              rgba(255,255,255,.55) 0%, rgba(58,51,46,.05) 100%);
-}
+/* El orden importa: .lupa-abierta va despues para ganarle a .is-abierto y
+   congelar el fondo mientras se mira una foto a pantalla completa. */
+body.is-abierto    { overflow: visible; }
+body.lupa-abierta  { overflow: hidden; }
 
-/* ---------------------------------------------------------------- escenario */
+/* --------------------------------------------------------------- escenario */
 
-.stage {
+.escena {
   position: relative;
-  z-index: 1;                       /* por encima de la viñeta (ver body::before) */
-  min-height: 100dvh;               /* dvh, no vh: la barra del móvil no recorta */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1.25rem, 4dvh, 2.5rem);
-  padding: max(1.5rem, env(safe-area-inset-top))
-           1.5rem
-           max(1.5rem, env(safe-area-inset-bottom));
+  height: 100dvh;                   /* dvh, no vh: la barra del móvil no recorta */
+  overflow: hidden;
 
   opacity: 0;                       /* entra cuando la animación está lista */
-  transition: opacity 700ms ease;
+  transition: opacity 800ms ease;
 }
-.stage.is-ready { opacity: 1; }
+.escena.is-ready { opacity: 1; }
+
+/* --------------------------------------------------------------- el sol */
+
+/* Un disco de canto duro, casi del mismo valor que el cielo: no es un motivo,
+   es de dónde viene la luz cálida del horizonte y de dónde saca su color la
+   semilla. Descentrado a propósito — un sol en el eje convertiría la escena
+   en un logotipo. La loma lejana le come el pie. */
+.sol {
+  position: absolute;
+  z-index: 0;
+  left: var(--sol-x);
+  top: calc(var(--horizonte) - 13%);
+  width: min(34vw, 168px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--sol);
+  opacity: .62;
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------- las lomas */
+
+/* Truco de arco: un bloque más ancho que la pantalla con el radio superior al
+   100% de su alto da una curva muy tendida que sigue siendo suave a cualquier
+   ancho. Con un <svg> habría que elegir entre deformar la curva o recortarla. */
+.loma {
+  position: absolute;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  pointer-events: none;
+}
+
+/* Su cumbre cae a la izquierda, no en el centro: con las dos lomas alineadas
+   en el eje la escena se leía como un planeta pequeño. */
+.loma--lejos {
+  z-index: 1;
+  width: 210%;
+  left: 26%;
+  transform: translateX(-50%);
+  top: calc(var(--horizonte) - 7%);
+  bottom: 0;
+  background: var(--bruma);
+}
+
+.loma--cerca {
+  z-index: 3;
+  width: 420%;                      /* más ancha ⇒ más plana ⇒ se lee cercana */
+  left: 50%;
+  transform: translateX(-50%);
+  top: var(--horizonte);
+  bottom: 0;
+  background: var(--tierra);
+  /* Sin canto claro. Llevaba un border-top de 2px y, en cuanto se desbloquea
+     el scroll, Chrome lo pintaba como una cuña de 135x77 px en la esquina: un
+     borde sobre una elipse de 819x169 no se comporta como una línea. Y de todas
+     formas apenas se veía — el salto de color con la bruma ya marca el canto. */
+}
+
+/* El montículo donde está sembrada la semilla. En reposo es un abultamiento
+   mínimo del suelo; al tocar, es lo primero que se mueve en toda la página:
+   la tierra empuja hacia arriba ANTES de que asome nada. Ese empujón es lo
+   que separa esto de un Lottie reproduciéndose solo.
+
+   Cuelga del eje como la semilla, no de la loma: así los tres se mueven
+   juntos al descentrar la escena. Va después de .loma--cerca en el HTML y con
+   su mismo z-index, para pintarse justo encima. */
+.monticulo {
+  position: absolute;
+  z-index: 3;
+  left: var(--eje);
+  top: calc(var(--horizonte) - 7px);
+  width: 140px;
+  height: 26px;
+  margin-left: -70px;
+  border-radius: 50%;
+  background: var(--tierra);
+  /* Sin el canto claro de la loma: aquí la tierra no está cortada a cuchillo,
+     está abultada, y la línea de luz lo convertía en una burbuja. */
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+/* La clase la pone y la quita app.js en cada estallido, no sólo al florecer:
+   la tierra empuja igual cuando sale una foto que cuando sale la flor. */
+.monticulo.brota { animation: empuje 1100ms cubic-bezier(.3,.7,.3,1); }
+
+@keyframes empuje {
+  0%   { transform: scaleY(1)    translateY(0); }
+  22%  { transform: scaleY(1.55) translateY(-3px); }
+  100% { transform: scaleY(1)    translateY(0); }
+}
 
 /* -------------------------------------------------------------------- flor */
 
-.bud {
+/* El punto de crecimiento del Lottie (--ox / --oy, que escribe app.js) se
+   ancla al horizonte con transform + transform-origin en el MISMO punto: así
+   el tallo nace exactamente donde estaba la semilla, y la escala del
+   asentamiento no lo desplaza. */
+.flor {
+  position: absolute;
+  z-index: 2;
+  left: var(--eje);
+  top: var(--horizonte);
+  /* El ancho sale del alto por la proporción, nunca al revés: si limitáramos
+     con max-width, el SVG se encajaría dentro con márgenes y el punto de
+     crecimiento dejaría de caer en --ox/--oy. */
+  height: min(var(--flor-alto), calc(var(--flor-ancho) / var(--ar, 1)));
+  aspect-ratio: var(--ar, 1);
+
+  transform-origin: var(--ox, 54.2%) var(--oy, 88.3%);
+  /* Un único dueño de la transformación: el rAF de app.js escribe --settle.
+     Con una animación CSS aquí, quitarla al tocar daba un salto visible. */
+  transform: translate(calc(var(--ox, 54.2%) * -1), calc(var(--oy, 88.3%) * -1))
+             scale(var(--settle, 1));
+  will-change: transform;
+  pointer-events: none;
+}
+.flor svg { display: block; width: 100%; height: 100%; }
+
+/* ------------------------------------------------------- la luz del suelo */
+
+/* La luz que respira. Antes del primer toque señala la semilla; después de que
+   la semilla se hunda sigue ahí, porque lo que se carga a cada toque ya no es
+   la semilla sino la tierra. Por eso no está dentro del botón.
+   Su tamaño y su brillo los escribe el rAF de app.js en --halo y --halo-o. */
+.brillo {
+  position: absolute;
+  z-index: 3;                       /* sobre la tierra, bajo la semilla */
+  left: var(--eje);
+  top: var(--horizonte);
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  pointer-events: none;
+  /* Ancho y tenue: tiene que leerse como luz sobre la tierra, no como una
+     pegatina brillante debajo de la semilla. */
+  background: radial-gradient(circle,
+              rgba(var(--calor-rgb), .55) 0%,
+              rgba(var(--miel-rgb),  .20) 30%,
+              rgba(var(--miel-rgb),  0)   66%);
+  opacity: var(--halo-o, .8);
+  transform: translate(-50%, -50%) scale(var(--halo, 1));
+}
+/* Cuando por fin sale la flor, la luz sobra: ya hay algo que mirar. */
+.is-bloomed .brillo {
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+/* ---------------------------------------------------------------- semilla */
+
+.semilla {
+  position: absolute;
+  z-index: 4;
+  left: var(--eje);
+  top: var(--horizonte);
+  transform: translate(-50%, -50%);
+
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -69,74 +328,511 @@ body::before {
   padding: 0;
   margin: 0;
   cursor: pointer;
-  display: block;
-  border-radius: 50%;
-}
-.is-bloomed .bud { cursor: default; }
 
-.bud:focus-visible {
-  outline: 2px solid var(--faint);
-  outline-offset: 12px;
-}
-
-.bud__art {
-  display: block;
-  /* --ar lo escribe app.js con la proporción real del Lottie (w/h). Un lienzo
-     cuadrado con una flor alta y estrecha se queda pequeño, porque 'meet' la
-     limita por el ancho y sobra sitio a los lados. Leyendo la proporción del
-     JSON, el hueco se ajusta solo a la flor que haya, sea cual sea. */
-  aspect-ratio: var(--ar, 1);
-  width: min(88vw, calc(58dvh * var(--ar, 1)));
-  /* Un único dueño para la transformación: el rAF de app.js escribe --settle,
-     que combina la respiración del capullo y el asentamiento de la floración.
-     Con una animación CSS aquí, quitarla al tocar daba un salto de escala
-     visible justo en el instante del toque. */
-  transform: scale(var(--settle, 1));
-  will-change: transform;
-}
-.bud__art svg { display: block; width: 100%; height: 100%; }
-
-/* ------------------------------------------------- pista y mensaje, apilados */
-
-/* Ambos ocupan la misma celda: el mensaje sustituye a 'tócala' sin que
-   nada se mueva de sitio. */
-.reveal {
+  /* 72px de diana para un dibujo de 14: el área táctil no tiene por qué medir
+     lo que mide el objeto. El halo, que sobresale, también recibe el toque. */
+  width: 72px;
+  height: 72px;
   display: grid;
-  /* 34ch deja el saludo en una sola línea y sigue siendo una medida sana si
-     algún día el mensaje crece a un par de párrafos. */
-  width: min(34ch, 88vw);
+  place-items: center;
+  border-radius: 50%;
+
+  transition: opacity 420ms ease, transform 620ms cubic-bezier(.4,0,.6,1);
 }
-.reveal > * { grid-area: 1 / 1; align-self: center; }
+/* Con --tinta-tenue el anillo era casi del color de la tierra y desaparecía. */
+.semilla:focus-visible { outline: 3px solid var(--tinta); outline-offset: 2px; }
 
-.hint {
-  margin: 0;
-  justify-self: center;
-  font-size: .95rem;
-  letter-spacing: .06em;
-  color: var(--faint);
-  transition: opacity 500ms ease;
-}
-.is-blooming .hint,
-.is-bloomed  .hint { opacity: 0; }
-
-.message { pointer-events: none; }
-
-.message p {
-  margin: 0 0 .55em;
-  font-size: clamp(1.2rem, 4.6vw, 1.6rem);
-  line-height: 1.55;
-  text-wrap: balance;
-
+/* Al hundirse no desaparece: se entierra. Es lo que le pasa de verdad, y pasa
+   en cuanto sale la primera foto — a partir de ahí ya no hay semilla que
+   tocar, se toca la pantalla entera. */
+.is-sembrada .semilla {
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 520ms ease, transform 520ms cubic-bezier(.2,.7,.2,1);
-  transition-delay: calc(var(--i, 0) * 120ms);
+  transform: translate(-50%, -50%) translateY(9px) scale(.6);
+  pointer-events: none;
 }
-.message p:last-child { margin-bottom: 0; }
 
-.is-bloomed .message p {
+.semilla__cuerpo {
+  width: 14px;
+  height: 19px;
+  background: rgb(var(--miel-rgb));
+  /* Almendra: esquinas de arriba más redondas que las de abajo. */
+  border-radius: 52% 52% 46% 46% / 62% 62% 38% 38%;
+  transform: rotate(-14deg) scale(var(--semilla-esc, 1));
+}
+
+/* ------------------------------------------------------- toques a partir
+                                                            de la primera foto */
+
+/* Una diana del tamaño de la pantalla. Aparece cuando la semilla se entierra:
+   a partir de ese momento tocar en cualquier sitio hace avanzar la escena, que
+   es lo que uno hace por instinto con el móvil en la mano. */
+.toque {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.toque:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: -6px;
+}
+
+/* --------------------------------------------------- sacudidas de la carga */
+
+/* Los dos primeros toques de cada fase no sacan nada; si no pasara nada de
+   nada se sentirían rotos. Lo que hacen es tensar: la semilla o la tierra dan
+   un tirón corto y la luz sube un escalón (eso último lo lleva app.js).
+   Reiniciar la animación al vuelo se hace quitando y volviendo a poner la
+   clase, con un reflow forzado en medio. */
+.tiembla { animation: tiron 200ms cubic-bezier(.3,1.6,.5,1); }
+
+@keyframes tiron {
+  0%   { scale: 1; }
+  38%  { scale: 1.22; }
+  100% { scale: 1; }
+}
+
+/* La tierra tiembla distinto: no crece, se estremece a lo ancho. */
+.monticulo.tiembla { animation: temblor 260ms ease-out; }
+
+@keyframes temblor {
+  0%, 100% { translate: 0 0; }
+  25%      { translate: -1.5px -2px; }
+  60%      { translate: 1.5px -1px; }
+}
+
+/* ------------------------------------------------------------ los recuerdos */
+
+/* Las fotos que salen disparadas de la tierra. Sólo hay una en el cielo a la
+   vez: cuando llega la siguiente, la anterior se va hacia arriba. Preferí eso
+   a irlas amontonando en las esquinas — en un móvil, tres fotos a la vez son
+   tres fotos que no se miran. */
+.recuerdos {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.recuerdo {
+  position: absolute;
+  left: var(--foto-x);
+  top: var(--foto-y);
+  width: var(--foto-ancho);
+  aspect-ratio: 4 / 5;
+
+  /* Una copia de papel: marco blanco parejo y una sombra azulada que la
+     separa del cielo. Nada de polaroid con el borde gordo abajo. */
+  padding: 2.4%;
+  background: #fdfcf8;
+  border-radius: 3px;
+  box-shadow: 0 14px 34px rgba(20, 55, 80, .20),
+              0 3px 8px   rgba(20, 55, 80, .12);
+
+  opacity: 0;                       /* no existe hasta que la tierra la escupe */
+  transform: translate(-50%, -50%) rotate(var(--giro, 0deg));
+}
+.recuerdo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1px;
+}
+
+/* Cada una cae con su propio ángulo: tres fotos con la misma inclinación
+   parecerían una plantilla. */
+.recuerdo:nth-child(1) { --giro: -2.6deg; }
+.recuerdo:nth-child(2) { --giro:  2.2deg; }
+.recuerdo:nth-child(3) { --giro: -1.6deg; }
+
+/* --lanza-x y --lanza-y los escribe app.js: son el vector de aquí al montículo,
+   en píxeles. En CSS no se puede, porque un porcentaje dentro de translate()
+   mide sobre la propia foto y no sobre la escena. */
+.recuerdo.entra { animation: salir-de-la-tierra 980ms cubic-bezier(.2,.86,.28,1) forwards; }
+.recuerdo.sale  { animation: irse-al-cielo 620ms ease-in forwards; }
+
+@keyframes salir-de-la-tierra {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%)
+               translate(var(--lanza-x, 0px), var(--lanza-y, 240px))
+               scale(.05) rotate(-28deg);
+  }
+  14% { opacity: 1; }
+  /* Se pasa de largo y baja: sin este fotograma sube como un ascensor. */
+  58% {
+    transform: translate(-50%, -50%)
+               translate(calc(var(--lanza-x, 0px) * .1), -32px)
+               scale(1.05) rotate(calc(var(--giro, 0deg) * 1.8));
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--giro, 0deg));
+  }
+}
+
+@keyframes irse-al-cielo {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--giro, 0deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-52px)
+               scale(.93) rotate(calc(var(--giro, 0deg) * .3));
+  }
+}
+
+/* ------------------------------------------------------- pista y mensaje */
+
+/* Va DEBAJO de la semilla, sobre la tierra: ahí no se pelea con el sol ni con
+   el cielo, y de paso la franja de suelo deja de ser un vacío. */
+.pista {
+  position: absolute;
+  z-index: 5;
+  left: var(--eje);
+  top: calc(var(--horizonte) + 44px);
+  transform: translateX(-50%);
+  margin: 0;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: .78rem;
+  letter-spacing: .34em;             /* muy abierta: se lee como una etiqueta,
+                                        no como una frase que compita */
+  text-indent: .17em;                /* la mitad del hueco que el tracking deja
+                                        tras la última letra: sin esto el texto
+                                        cae medio hueco a la izquierda del eje */
+  color: var(--sobre-tierra);
+  transition: opacity 400ms ease;
+}
+.is-blooming .pista,
+.is-bloomed  .pista { opacity: 0; }
+
+/* El texto cambia entre fases ("tócala" -> "otra vez" -> ...). Sin este
+   parpadeo el cambio pasa desapercibido y parece que la pista está muerta. */
+.pista.cambia { animation: pista-vuelve 460ms ease; }
+
+@keyframes pista-vuelve {
+  0%   { opacity: 0; translate: 0 4px; }
+  100% { opacity: 1; translate: 0 0; }
+}
+
+/* El mensaje vive en el cielo, encima de donde llegará la flor: la mirada
+   sube con el tallo y aterriza en las palabras. */
+.mensaje {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  /* max() con el area segura: en un movil con muesca, un 6% pelado se metia
+     debajo de la barra de estado. */
+  top: max(6%, calc(env(safe-area-inset-top) + 14px));
+  transform: translateX(-50%);
+  width: min(30rem, 86vw);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Lo que comparten todas las líneas del mensaje: cómo entran. La tipografía
+   va en .titulo y .carta, que con dos clases ganan a este selector. */
+.mensaje p {
+  margin: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--i, 0) * 220ms);
+}
+
+.mensaje .titulo {
+  font-family: "Fraunces Display", "Iowan Old Style", "Palatino Linotype",
+               Palatino, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2rem, 10.6vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -.012em;
+  text-wrap: balance;
+}
+
+/* La carta. Medida corta y interlínea ancha: es lo único de la página que se
+   lee de verdad, línea a línea, y no de un vistazo. */
+.mensaje .carta {
+  font-family: "Fraunces Texto", "Iowan Old Style", "Palatino Linotype",
+               Palatino, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.02rem, 4.3vw, 1.22rem);
+  line-height: 1.62;
+  letter-spacing: .002em;
+  text-wrap: pretty;                /* evita la palabra huérfana en la última línea */
+  color: rgba(33, 69, 95, .88);     /* --tinta bajada un punto: no compite con el título */
+
+  max-width: 31ch;                  /* medida cómoda, aunque la caja sea más ancha */
+  margin: .95em auto 0;
+}
+.mensaje .titulo + .carta { margin-top: 1.05em; }
+.mensaje .carta + .carta  { margin-top: .7em; }
+
+.is-bloomed .mensaje p {
   opacity: 1;
   transform: none;
+}
+
+/* --------------------------------------------------------- bajar al jardín */
+
+/* Aparece cuando el mensaje ya está puesto, y sólo entonces app.js desbloquea
+   el scroll. Hasta ese momento la página es una sola pantalla, a propósito. */
+.bajar {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
+  transform: translateX(-50%);
+
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: var(--sobre-tierra);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: .74rem;
+  letter-spacing: .3em;
+  text-indent: .15em;
+
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+.is-abierto .bajar { opacity: 1; }
+.bajar:focus-visible { outline: 2px solid var(--sobre-tierra); outline-offset: 2px; }
+
+/* Una punta de flecha dibujada con dos lados de un cuadrado girado: no hace
+   falta ni un icono ni una fuente para esto. */
+.bajar__flecha {
+  width: 9px;
+  height: 9px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  rotate: 45deg;
+  animation: llamar 2600ms ease-in-out infinite;
+}
+
+@keyframes llamar {
+  0%, 62%, 100% { translate: 0 0;   opacity: .55; }
+  80%           { translate: 0 4px; opacity: 1; }
+}
+
+/* ------------------------------------------------------------- el jardín */
+
+/* La segunda pantalla. No es otro cielo: es lo que hay DEBAJO de la flor.
+   Por eso arranca exactamente en el color de la tierra de la escena — al
+   deslizar no hay costura, se sigue bajando por el mismo suelo — y se va
+   oscureciendo conforme se baja. */
+.jardin {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  padding: clamp(3rem, 12vh, 6rem) 0 clamp(3.5rem, 14vh, 7rem);
+  background: linear-gradient(180deg,
+              var(--tierra) 0%,
+              #4a7fa3     26%,
+              #3a6787     70%,
+              #325a76    100%);
+}
+
+.jardin__intro {
+  margin: 0 auto clamp(2rem, 6vh, 3.2rem);
+  width: min(30ch, 84vw);
+  text-align: center;
+  font-family: "Fraunces Texto", "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: clamp(1.05rem, 4.6vw, 1.4rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, .9);
+}
+
+.jardin__rejilla {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: min(540px, 86vw);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(16px, 4vw, 26px);
+}
+
+/* Esparcidas, no alineadas: son copias tiradas sobre la tierra, no una
+   cuadrícula de galería. El giro alterna y las pares bajan un poco. */
+.jardin__rejilla li:nth-child(odd)  { rotate: -1.7deg; }
+.jardin__rejilla li:nth-child(even) { rotate: 1.5deg; translate: 0 16px; }
+
+/* Con un número impar de fotos la última se queda sola y la fila cojea. En vez
+   de disimularlo, se convierte en el cierre: cruza las dos columnas, se centra
+   y sale un poco más grande. */
+.jardin__rejilla li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 58%;
+  margin-top: clamp(8px, 2vw, 16px);
+  rotate: 1.2deg;
+}
+
+.copia {
+  display: block;
+  width: 100%;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* El mismo papel que los recuerdos del cielo: es la misma copia, replantada. */
+  padding: 3%;
+  background: #fdfcf8;
+  border-radius: 3px;
+  box-shadow: 0 12px 26px rgba(12, 38, 56, .3),
+              0 2px 6px   rgba(12, 38, 56, .18);
+  transition: transform 260ms cubic-bezier(.2,.8,.3,1),
+              box-shadow 260ms ease;
+}
+.copia:hover,
+.copia:focus-visible {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 38px rgba(12, 38, 56, .34),
+              0 3px 8px   rgba(12, 38, 56, .2);
+}
+.copia:focus-visible { outline: 3px solid #fdfcf8; outline-offset: 3px; }
+.copia:active { transform: translateY(-1px) scale(.99); }
+
+.copia img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+}
+
+/* ---------------------------------------------------------------- la lupa */
+
+/* La foto a pantalla completa cuando se toca una copia. */
+.lupa {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px
+           max(20px, env(safe-area-inset-bottom));
+  background: rgba(16, 42, 60, .93);
+
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+.lupa.is-vista { opacity: 1; }
+
+.lupa__foto {
+  max-width: min(100%, 560px);
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border-radius: 3px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+  transform: scale(.94);
+  transition: transform 300ms cubic-bezier(.2,.9,.3,1);
+}
+.lupa.is-vista .lupa__foto { transform: scale(1); }
+
+/* Ocupa toda la capa: tocar en cualquier sitio cierra, que es lo que uno
+   intenta. La cruz de arriba es sólo la señal de que se puede. */
+.lupa__cerrar {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.lupa__cerrar::before,
+.lupa__cerrar::after {
+  content: "";
+  position: absolute;
+  top: max(26px, calc(env(safe-area-inset-top) + 20px));
+  right: 24px;
+  width: 20px;
+  height: 1.6px;
+  background: rgba(255, 255, 255, .85);
+}
+.lupa__cerrar::before { rotate: 45deg; }
+.lupa__cerrar::after  { rotate: -45deg; }
+.lupa__cerrar:focus-visible { outline: 2px solid #fff; outline-offset: -8px; }
+
+/* -------------------------------------------------------------- el papel */
+
+/* Grano finísimo sobre todo. Sin él los planos de color se leen como CSS;
+   con él, como papel. Es la única capa que toca a la flor. */
+.grano {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  opacity: .5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='.22'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------- variantes */
+
+/* Pantallas bajas (móvil en horizontal): la flor se encoge y el horizonte
+   baja, para que el mensaje y la flor no se peleen por el mismo sitio. */
+@media (max-height: 560px) {
+  :root { --horizonte: 82%; --flor-alto: 62dvh; }
+  .mensaje { top: 5%; }
+  /* Con .mensaje p aquí no bastaría: .mensaje .titulo tiene dos clases y gana.
+     Una media query no suma especificidad. */
+  .mensaje .titulo { font-size: clamp(1.3rem, 4.4vh, 1.9rem); }
+  .mensaje .carta  { font-size: clamp(.86rem, 2.5vh, 1rem); line-height: 1.5; }
+  .mensaje .titulo + .carta { margin-top: .6em; }
+  .pista { top: calc(var(--horizonte) + 30px); }   /* sigue bajo la semilla */
+}
+
+/* Pantallas anchas: la escena es un paisaje, no una columna. La flor se
+   siembra a la derecha y el mensaje ocupa el hueco de cielo de la izquierda,
+   en vez de caerle encima. */
+@media (min-width: 900px) {
+  /* El sol cruza al otro lado: en reposo la escena se quedaba toda apelotonada
+     en una esquina, con la mitad izquierda vacía. */
+  :root {
+    --eje: 63%; --sol-x: 26%; --horizonte: 80%; --flor-alto: 66dvh;
+    /* La foto aterriza donde luego irá el mensaje, igual que en móvil: a la
+       izquierda. El salto desde el montículo pasa a ser en diagonal, y app.js
+       ya calcula las dos componentes. */
+    --foto-x: 30%; --foto-y: 46%;
+  }
+
+  .mensaje {
+    left: 9%;
+    top: 24%;                       /* más arriba: aquí la carta puede crecer */
+    transform: none;
+    width: min(26rem, 40vw);
+    text-align: left;
+  }
+  .mensaje .titulo { font-size: clamp(2.4rem, 4.4vw, 3.8rem); }
+  .mensaje .carta {
+    margin-left: 0;                 /* alineada al título, no centrada bajo él */
+    margin-right: 0;
+    max-width: 34ch;
+    font-size: clamp(1.05rem, 1.35vw, 1.24rem);
+  }
+
+  .jardin__rejilla {
+    width: min(1000px, 84vw);
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* --------------------------------------------------------------- utilidades */
@@ -153,6 +849,16 @@ body::before {
 /* Sin animación: se abre ya florecida, sin pedir interacción.
    (app.js además no arranca la respiración ni el tween.) */
 @media (prefers-reduced-motion: reduce) {
-  .stage, .hint, .message p { transition: none; }
-  .bud { cursor: default; }
+  html { scroll-behavior: auto; }
+  .escena, .pista, .mensaje p, .semilla, .copia, .lupa, .lupa__foto,
+  .brillo, .bajar { transition: none; }
+  .semilla { display: none; }
+  .bajar__flecha { animation: none; }
+
+  /* Con la misma especificidad que las reglas que animan, si no, pierden:
+     una media query no suma especificidad. */
+  .monticulo.brota { animation: none; }
+  .recuerdo.entra  { animation: none; opacity: 1; }
+  .recuerdo.sale   { animation: none; opacity: 0; }
+  .lupa__foto      { transform: none; }
 }

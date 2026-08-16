@@ -7,27 +7,42 @@
   Página auxiliar para inspeccionar el timeline de una animación Lottie.
   NO forma parte de la página que ve Annie.
 
-  Sirve para dos cosas al cambiar la flor:
+  Sirve para tres cosas al cambiar la flor:
     1. Comprobar que el timeline sea una floración/crecimiento lineal.
-    2. Elegir FRAME_FROM y FRAME_TO en app.js — muchas animaciones empiezan
-       vacías y se quedan quietas antes del final, y ese tiempo hay que
-       recortarlo o la interacción se siente muerta por los extremos.
+    2. Elegir FRAME_FROM y FRAME_TO en app.js. FRAME_FROM tiene que caer en un
+       fotograma VACÍO — no en uno con la flor pequeña — porque en reposo la
+       página no debe enseñar nada: lo que se ve es la semilla. FRAME_TO, donde
+       la animación deja de moverse.
+    3. Elegir ORIGIN_X / ORIGIN_Y: el punto desde el que crece la planta, que
+       es donde se planta la semilla y por donde pasa el horizonte. La cruz
+       roja marca los valores actuales; mueve ?o= hasta que caiga en la base
+       del tallo en TODOS los fotogramas.
 
   Uso — desde la raíz del proyecto:
     python -m http.server 8000
     y abrir http://127.0.0.1:8000/tools/frames.html
     Parámetros opcionales:
       ?s=0,0.25,0.5,0.75,1     los puntos a mostrar
+      &o=0.542,0.883           dónde dibujar la cruz del punto de crecimiento
       &f=../assets/otra.json   otro archivo
 -->
 <style>
-  html, body { margin: 0; background: #faf7f2; }
+  html, body { margin: 0; background: #eaf3f8; }
   body { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 12px;
-         font: 12px/1 system-ui, sans-serif; color: #8a8078; }
+         font: 12px/1 system-ui, sans-serif; color: #55707f; }
   figure { margin: 0; text-align: center; }
-  .box { width: 220px; height: 220px; outline: 1px solid #e6e0d8; }
+  .box { position: relative; width: 220px; height: 220px; outline: 1px solid #c9dced; }
   .box svg { display: block; width: 100%; height: 100%; }
   figcaption { padding-top: 6px; }
+
+  /* Cruz del punto de crecimiento, en fracción del lienzo. */
+  .cruz { position: absolute; pointer-events: none; }
+  .cruz::before, .cruz::after {
+    content: ""; position: absolute; background: rgba(214, 69, 45, .55);
+  }
+  .cruz { left: 0; right: 0; }
+  .cruz::before { left: 0; right: 0; top: 0; height: 1px; }
+  .cruz::after  { top: -8px; bottom: -8px; left: var(--ox); width: 1px; }
 </style>
 </head>
 <body>
@@ -36,13 +51,20 @@
 var q = new URLSearchParams(location.search);
 var file = q.get('f') || '../assets/flower.json';
 var stops = q.get('s') ? q.get('s').split(',').map(Number)
-                       : [0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.85, 1];
+                       : [0, 0.03, 0.06, 0.1, 0.2, 0.4, 0.6, 0.88];
+// Los mismos ORIGIN_X / ORIGIN_Y de app.js.
+var origen = (q.get('o') || '0.542,0.883').split(',').map(Number);
 
 fetch(file).then(function (r) { return r.json(); }).then(function (data) {
   stops.forEach(function (p) {
     var fig = document.createElement('figure');
     var box = document.createElement('div');
     box.className = 'box';
+    var cruz = document.createElement('div');
+    cruz.className = 'cruz';
+    cruz.style.setProperty('--ox', (origen[0] * 100) + '%');
+    cruz.style.top = (origen[1] * 100) + '%';
+    box.appendChild(cruz);
     var cap = document.createElement('figcaption');
     cap.textContent = 'p = ' + p;
     fig.appendChild(box); fig.appendChild(cap);
