@@ -470,6 +470,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         m.bloqueada = false;
         m.foto = f;
         m.comentario = d.comentario || '';
+        if (Object.prototype.hasOwnProperty.call(d, 'mitad')) m.mitad = d.mitad;   // la del corazón
         recien = m.id;
         if (d.final) estado.final = d.final;
         revelado.className = 'revelado is-listo is-aprobada';
@@ -520,7 +521,24 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     msj.textContent = '';
     (f.mensaje || []).forEach(function (t) { msj.appendChild(el('p', null, t)); });
 
+    var par = parDelCorazon();
+    var corazon = $('corazon');
+    tarjeta.classList.toggle('tarjeta--par', !!par);
+    corazon.hidden = !par;
+    if (par) {
+      $('mitadElla').src = par.ella.foto;
+      var suya = $('mitadJuan');
+      // Si la mitad de Juan no carga, la tarjeta vuelve a ser la de siempre.
+      suya.onerror = function () {
+        if (estado.final && estado.final.mitad === par.juan) { estado.final.mitad = null; abrirTarjeta(false); }
+      };
+      suya.src = par.juan;
+      corazon.classList.toggle('corazon--espejo', par.ella.mitad === 'izquierda');
+      juntarAlVerlo(corazon, conCierre ? 2600 : 300);
+    }
+
     var collage = $('collage');
+    collage.classList.toggle('collage--tres', !!par);
     Array.prototype.forEach.call(collage.querySelectorAll('.polaroid--mini'), function (n) { n.remove(); });
     fotosDelDia().forEach(function (m, i) {
       var p = el('figure', 'polaroid polaroid--mini');
@@ -556,8 +574,41 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     }
   }
 
+  /* Las de la órbita: todas las hechas menos la del corazón cuando va aparte. */
   function fotosDelDia() {
-    return estado.misiones.filter(function (m) { return m.hecha && m.foto; }).slice(0, 4);
+    var par = parDelCorazon();
+    return estado.misiones.filter(function (m) {
+      return m.hecha && m.foto && !(par && m === par.ella);
+    }).slice(0, 4);
+  }
+
+  /* El par sólo existe si Juan ya subió su mitad (final.mitad) y ella hizo la
+     misión del corazón, que es la que trae la clave `mitad` (no se busca por
+     id). Si falta cualquiera de las dos, la tarjeta es la de siempre. */
+  function parDelCorazon() {
+    var f = estado.final;
+    if (!f || !f.mitad) return null;
+    var ella = estado.misiones.filter(function (m) {
+      return Object.prototype.hasOwnProperty.call(m, 'mitad');
+    })[0];
+    return ella && ella.hecha && ella.foto ? { ella: ella, juan: f.mitad } : null;
+  }
+
+  /* Las dos mitades esperan separadas y se juntan cuando el corazón entra en
+     pantalla. `espera` deja terminar antes la entrada de la tarjeta. */
+  var observador = null;
+  function juntarAlVerlo(n, espera) {
+    if (observador) observador.disconnect();
+    n.classList.remove('late');
+    if (reduced || !('IntersectionObserver' in window)) { n.classList.remove('separado'); return; }
+    n.classList.add('separado');
+    var o = observador = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      o.disconnect();
+      n.classList.remove('separado');
+      n.classList.add('late');
+    }, { threshold: 0.6 });
+    setTimeout(function () { if (o === observador) o.observe(n); }, espera);
   }
 
   function cargarImagen(src) {
@@ -581,7 +632,19 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       document.fonts.load('600 80px "Fraunces Display"'),
       document.fonts.load('400 40px "Fraunces Texto"')
     ]).catch(function () {}).then(function () { return document.fonts.ready; });
-    var imgs = Promise.all([cargarImagen(f.foto)].concat(fotosDelDia().map(function (m) { return cargarImagen(m.foto); })));
+    var par = parDelCorazon();
+    var orbita = fotosDelDia();
+    var imgs = Promise.all([cargarImagen(f.foto)]
+      .concat(orbita.map(function (m) { return cargarImagen(m.foto); }))
+      .concat(par ? [cargarImagen(par.ella.foto), cargarImagen(par.juan)] : []));
+
+    /* Dos composiciones: la de siempre, y con el corazón, donde la órbita
+       sube y encoge para dejarle al par la mitad de abajo. */
+    var L = par
+      ? { tituloPx: 84, tituloY: 150, tituloPaso: 92, cy: 590, centro: 400, mini: 250,
+          sitios: [[235, 450, -8], [850, 600, 7], [250, 765, 5]], textoTop: 1440, textoTam: 42 }
+      : { tituloPx: 92, tituloY: 210, tituloPaso: 100, cy: 860, centro: 560, mini: 330,
+          sitios: [[250, 560, -8], [835, 590, 7], [245, 1140, 6], [840, 1110, -5]], textoTop: 1330, textoTam: 46 };
 
     return Promise.all([fuentes, imgs]).then(function (r) {
       var fotos = r[1];
@@ -597,7 +660,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       ctx.fillStyle = cielo;
       ctx.fillRect(0, 0, W, H);
 
-      var cx = W / 2, cy = 860;
+      var cx = W / 2, cy = L.cy;
       var sol = ctx.createRadialGradient(cx, cy, 0, cx, cy, 480);
       sol.addColorStop(0, 'rgba(253,242,223,.95)');
       sol.addColorStop(0.45, 'rgba(253,238,203,1)');
@@ -608,7 +671,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       ctx.fillStyle = '#21455f';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
-      ctx.font = '600 92px "Fraunces Display", Georgia, serif';
+      ctx.font = '600 ' + L.tituloPx + 'px "Fraunces Display", Georgia, serif';
       // Equilibra el título: el ancho más estrecho que no añade líneas, para
       // que no quede una palabra sola abajo.
       var lineasTitulo = partir(ctx, f.titulo || '', 900);
@@ -617,17 +680,22 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         if (probar.length > lineasTitulo.length) break;
         lineasTitulo = probar;
       }
-      lineasTitulo.forEach(function (l, i) { ctx.fillText(l, cx, 210 + i * 100); });
+      lineasTitulo.forEach(function (l, i) { ctx.fillText(l, cx, L.tituloY + i * L.tituloPaso); });
 
-      var sitios = [[250, 560, -8], [835, 590, 7], [245, 1140, 6], [840, 1110, -5]];
-      fotos.slice(1).forEach(function (img, i) {
-        polaroidEnLienzo(ctx, img, sitios[i][0], sitios[i][1], 330, sitios[i][2], true);
+      fotos.slice(1, 1 + orbita.length).forEach(function (img, i) {
+        var s = L.sitios[i];
+        if (s) polaroidEnLienzo(ctx, img, s[0], s[1], L.mini, s[2], true);
       });
-      polaroidEnLienzo(ctx, fotos[0], cx, cy, 560, -2, false);
+      polaroidEnLienzo(ctx, fotos[0], cx, cy, L.centro, -2, false);
+      if (par) {
+        var ps = fotos.slice(1 + orbita.length);
+        parEnLienzo(ctx, ps[0], ps[1], par.ella.mitad === 'izquierda', cx, 1135, 620);
+        ctx.fillStyle = '#21455f';
+      }
 
       // El mensaje: baja de tamaño hasta que quepa.
       var parrafos = f.mensaje || [];
-      var top = 1330, fondo = 1800, tam = 46, bloques, alto;
+      var top = L.textoTop, fondo = 1800, tam = L.textoTam, bloques, alto;
       do {
         ctx.font = '400 ' + tam + 'px "Fraunces Texto", Georgia, serif';
         bloques = parrafos.map(function (p) { return partir(ctx, p, 860); });
@@ -693,6 +761,43 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       ctx.rotate(-3 * Math.PI / 180);
       ctx.fillRect(-w * 0.17, -h / 2 - 12, w * 0.34, 24);
     }
+    ctx.restore();
+  }
+
+  /* Recorta `img` como cover dentro de w×h y, si hace falta, la voltea. */
+  function fotoCover(ctx, img, x, y, w, h, espejo) {
+    if (!img) { ctx.fillStyle = '#34495a'; ctx.fillRect(x, y, w, h); return; }
+    var iw = img.naturalWidth, ih = img.naturalHeight, k = Math.max(w / iw, h / ih);
+    var sw = w / k, sh = h / k;
+    ctx.save();
+    if (espejo) { ctx.translate(x + w, y); ctx.scale(-1, 1); x = 0; y = 0; }
+    ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
+    ctx.restore();
+  }
+
+  /* El corazón en el lienzo: un solo papel, las dos fotos 3:4 tocándose. */
+  function parEnLienzo(ctx, ella, juan, espejo, x, y, ancho) {
+    var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw * 4 / 3, pie = ancho * 0.09;
+    var h = pad + fh + pie;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-1.5 * Math.PI / 180);
+    ctx.shadowColor = 'rgba(20,55,80,.28)';
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 16;
+    ctx.fillStyle = '#fdfcf8';
+    ctx.fillRect(-ancho / 2, -h / 2, ancho, h);
+    ctx.shadowColor = 'transparent';
+    fotoCover(ctx, ella, -ancho / 2 + pad, -h / 2 + pad, fw, fh, espejo);
+    fotoCover(ctx, juan, 0, -h / 2 + pad, fw, fh, false);
+    ctx.font = '600 22px ui-sans-serif, system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = '#3f5d72';
+    ctx.textAlign = 'center';
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '5px';
+    var ly = -h / 2 + pad + fh + pie * 0.62;
+    ctx.fillText('ESPAÑA', -ancho / 2 + pad + fw / 2, ly);
+    ctx.fillText('VENEZUELA', fw / 2, ly);
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
     ctx.restore();
   }
 

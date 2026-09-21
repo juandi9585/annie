@@ -140,6 +140,19 @@
     </figure>
   </div>
   <div class="tarjeta__mensaje" id="tarjetaMensaje"></div>
+
+  <!-- El corazón partido: la mitad de ella (su misión del corazón) y la de
+       Juan, que se juntan. Sólo aparece si el backend manda final.mitad. -->
+  <figure class="corazon" id="corazon" aria-label="Un corazón entre los dos: tu mitad desde España y la de Juan desde Venezuela" hidden>
+    <div class="corazon__mitad">
+      <div class="corazon__foto"><img id="mitadElla" alt="Tu mitad del corazón"></div>
+      <span class="corazon__lugar">España</span>
+    </div>
+    <div class="corazon__mitad corazon__mitad--juan">
+      <div class="corazon__foto"><img id="mitadJuan" alt="La otra mitad, la de Juan"></div>
+      <span class="corazon__lugar">Venezuela</span>
+    </div>
+  </figure>
   <button class="boton boton--miel" id="guardar" type="button">Guardar tarjeta</button>
   <p class="tarjeta__nota" id="guardarNota" role="status"></p>
 </section>

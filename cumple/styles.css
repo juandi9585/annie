@@ -717,6 +717,62 @@ body {
 .polaroid--mini:nth-of-type(4) { left: 2%;   bottom: 3%; --giro:  6deg; }
 .polaroid--mini:nth-of-type(5) { right: 1%;  bottom: 0;  --giro: -5deg; }
 
+/* Con el corazón, la mitad de ella sale de la órbita y quedan tres: un
+   triángulo alrededor de la foto de los dos en vez de cuatro esquinas. */
+.collage--tres .polaroid--mini { width: 36%; }
+.collage--tres .polaroid--mini:nth-of-type(3) { right: -1%; top: 33%; }
+.collage--tres .polaroid--mini:nth-of-type(4) { left: 3%; bottom: 1%; --giro: 5deg; }
+
+/* El corazón partido. Dos medias polaroids 3:4 (no cuadradas: en una selfie
+   la mano cae cerca del borde) sin marco en el lado que se tocan, así que
+   al juntarse forman un solo papel y un solo corazón. La sombra va en el
+   conjunto (drop-shadow) para que no se pinte una mitad sobre la otra. */
+.corazon {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 420px);
+  margin: 2.6rem 0 0;
+  rotate: -1.5deg;
+  filter: drop-shadow(0 14px 18px rgba(20, 55, 80, .2)) drop-shadow(0 3px 5px rgba(20, 55, 80, .12));
+}
+.corazon__mitad {
+  padding: 7% 0 0 7%;
+  background: var(--papel);
+  transition: transform 1300ms var(--salida);
+}
+.corazon__mitad--juan { padding: 7% 7% 0 0; }
+.corazon__foto {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--pelicula);
+}
+.corazon__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Su curva abría hacia la izquierda: se voltea para que busque la de Juan. */
+.corazon--espejo #mitadElla { transform: scaleX(-1); }
+.corazon__lugar {
+  display: block;
+  padding: .75rem 0 .95rem;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .24em;
+  text-indent: .12em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+/* Antes de verlo, cada mitad en su orilla; al entrar en pantalla se juntan
+   y el corazón late una vez. */
+.corazon.separado .corazon__mitad       { transform: translateX(-16%) rotate(-5deg); }
+.corazon.separado .corazon__mitad--juan { transform: translateX(16%) rotate(5deg); }
+.corazon.late { animation: latido 700ms 1050ms ease-out; }
+@keyframes latido {
+  0%, 100% { scale: 1; }
+  35%      { scale: 1.045; }
+  65%      { scale: .992; }
+}
+
 .tarjeta__mensaje { max-width: 32ch; }
 .tarjeta__mensaje p {
   margin: 0;
@@ -832,6 +888,16 @@ body {
   .tarjeta__mensaje { grid-area: mensaje; margin-top: 1.4rem; }
   #guardar          { grid-area: boton; justify-self: start; }
   .tarjeta__nota    { grid-area: nota; }
+
+  /* Con el corazón, éste es el cierre: ancho completo, debajo de todo, y el
+     botón de guardar después de él. */
+  .tarjeta--par {
+    grid-template-areas: "collage titulo" "collage mensaje" "collage ." "corazon corazon" "boton boton" "nota nota";
+    grid-template-rows: auto auto 1fr auto auto auto;   /* la fila 1fr absorbe lo que el collage mide de más */
+  }
+  .tarjeta--par .corazon       { grid-area: corazon; justify-self: center; width: min(100%, 500px); margin-top: 4.5rem; }
+  .tarjeta--par #guardar       { justify-self: center; margin-top: 2.6rem; }
+  .tarjeta--par .tarjeta__nota { text-align: center; }
 }
 
 /* --------------------------------------------------------------- utilidades */
@@ -855,5 +921,7 @@ body {
   .revelado.is-rechazada .polaroid--grande { transition: none; }
   .tarjeta.entra .tarjeta__titulo, .tarjeta.entra .collage__sol,
   .tarjeta.entra .polaroid--centro, .tarjeta.entra .polaroid--mini,
-  .tarjeta.entra .tarjeta__mensaje, .tarjeta.entra #guardar { animation: none; }
+  .tarjeta.entra .tarjeta__mensaje, .tarjeta.entra #guardar,
+  .corazon.late { animation: none; }
+  .corazon__mitad { transition: none; }
 }
