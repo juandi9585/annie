@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para Annie</title>
+
+<!-- Como en la flor: el preview del enlace no cuenta nada. -->
+<meta name="description" content="hoy es tu día.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Para Annie">
+<meta property="og:description" content="hoy es tu día.">
+<meta property="og:url" content="https://juandi9585.github.io/annie/cumple/">
+<meta name="theme-color" content="#a6cfe9">
+
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/fraunces-display.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/fraunces-texto.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="cielo" aria-hidden="true"></div>
+
+<main class="portada" id="portada">
+
+  <header class="saludo">
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       EL MENSAJE.  Es lo único de este archivo que hace falta tocar.
+
+       · titulo — el grito. Dos líneas como mucho.
+       · <p>    — la explicación, en tu voz. Puedes añadir o quitar párrafos
+                  <p> dentro de <div class="carta"> sin tocar CSS ni JS.
+       · &nbsp; — espacio que no se parte: úsalo donde te moleste un corte.
+
+       Las misiones NO van aquí: sus títulos e instrucciones vienen del
+       backend, así que se cambian allí.
+       ═══════════════════════════════════════════════════════════════════ -->
+
+    <h1 class="titulo">¡Feliz cumpleaños, Annie!</h1>
+
+    <div class="carta">
+      <p>Hoy te van a ir llegando cosas a lo largo del día, bebi. Cada una trae una misión: una foto que tienes que hacer aquí mismo, en vivo, con la cámara de esta página.</p>
+      <p>Mi IA la revisa y te dice si la clavaste. Y cada foto que hagas me llega a mí, allá en Venezuela: así estoy un poquito contigo en cada una.</p>
+      <p>Cuando las completes todas, se abre tu tarjeta.</p>
+    </div>
+
+  <!-- ═══════════════════════════ fin del mensaje ══════════════════════ -->
+
+  </header>
+
+  <section class="misiones" aria-labelledby="misionesTitulo">
+    <h2 class="misiones__titulo" id="misionesTitulo">Tus misiones <span class="misiones__cuenta" id="cuenta"></span></h2>
+
+    <div class="aviso" id="aviso" role="alert" hidden>
+      <p class="aviso__texto" id="avisoTexto"></p>
+      <button class="boton" id="avisoReintentar" type="button">Reintentar</button>
+    </div>
+
+    <!-- Lo rellena app.js con lo que devuelva el backend. -->
+    <ol class="tablero" id="tablero" aria-busy="true"></ol>
+  </section>
+
+</main>
+
+
+<!-- La cámara. Sólo getUserMedia: aquí no hay ningún <input type="file">, a
+     propósito, para que no se pueda elegir una foto de la galería. -->
+<section class="camara" id="camara" aria-label="Cámara" hidden>
+  <video class="camara__video" id="video" playsinline muted autoplay></video>
+  <img class="camara__captura" id="captura" alt="La foto que acabas de hacer" hidden>
+  <div class="camara__flash" id="flash" aria-hidden="true"></div>
+
+  <div class="camara__arriba">
+    <p class="camara__titulo" id="camTitulo"></p>
+    <p class="camara__instruccion" id="camInstruccion"></p>
+  </div>
+
+  <div class="camara__abajo" id="controlesVivo">
+    <button class="redondo" id="camVolver" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span class="visually-hidden">Volver</span>
+    </button>
+    <button class="disparador" id="disparar" type="button">
+      <span class="visually-hidden">Hacer la foto</span>
+    </button>
+    <button class="redondo" id="voltear" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6M20 12a8 8 0 0 1-13.7 5.6"/><path d="M18 3v3.6h-3.6M6 21v-3.6h3.6"/></svg>
+      <span class="visually-hidden">Cambiar de cámara</span>
+    </button>
+  </div>
+
+  <div class="camara__abajo camara__abajo--foto" id="controlesFoto" hidden>
+    <button class="boton boton--claro" id="repetir" type="button">Repetir</button>
+    <button class="boton boton--papel" id="enviar" type="button">Enviar</button>
+  </div>
+
+  <div class="camara__error" id="camError" role="alert" hidden>
+    <p class="camara__error-titulo" id="camErrorTitulo"></p>
+    <div class="camara__error-texto" id="camErrorTexto"></div>
+    <div class="camara__error-acciones">
+      <button class="boton" id="camReintentar" type="button">Reintentar</button>
+      <button class="boton boton--suave" id="camErrorVolver" type="button">Volver</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- La revisión y el resultado son la misma polaroid: primero se revela
+     mientras el backend decide, luego lleva el comentario escrito al pie. -->
+<section class="revelado" id="revelado" aria-label="Tu foto" tabindex="-1" hidden>
+  <figure class="polaroid polaroid--grande" id="revPolaroid">
+    <span class="polaroid__cinta" aria-hidden="true"></span>
+    <div class="polaroid__hueco">
+      <img id="revFoto" alt="La foto que acabas de mandar">
+      <div class="polaroid__velo" id="revVelo" aria-hidden="true"></div>
+    </div>
+    <figcaption class="polaroid__pie">
+      <span class="polaroid__titulo" id="revTitulo"></span>
+      <span class="polaroid__comentario" id="revComentario" aria-live="polite"></span>
+    </figcaption>
+  </figure>
+  <p class="revelado__linea" id="revLinea" role="status"></p>
+  <div class="revelado__acciones" id="revAcciones" hidden>
+    <button class="boton" id="revPrincipal" type="button"></button>
+    <button class="boton boton--suave" id="revSecundario" type="button"></button>
+  </div>
+</section>
+
+
+<!-- La tarjeta final. El título, el mensaje y la foto de los dos vienen del
+     backend; las polaroids de alrededor son las que ella ha hecho hoy. -->
+<section class="tarjeta" id="tarjeta" aria-labelledby="tarjetaTitulo" tabindex="-1" hidden>
+  <h1 class="tarjeta__titulo" id="tarjetaTitulo"></h1>
+  <div class="collage" id="collage">
+    <span class="collage__sol" aria-hidden="true"></span>
+    <figure class="polaroid polaroid--centro">
+      <div class="polaroid__hueco"><img id="tarjetaFoto" alt="Juan y Annie juntos"></div>
+    </figure>
+  </div>
+  <div class="tarjeta__mensaje" id="tarjetaMensaje"></div>
+  <button class="boton boton--miel" id="guardar" type="button">Guardar tarjeta</button>
+  <p class="tarjeta__nota" id="guardarNota" role="status"></p>
+</section>
+
+<!-- Plan B de «Guardar tarjeta» cuando el navegador no sabe compartir archivos. -->
+<div class="guardado" id="guardado" role="dialog" aria-modal="true" aria-labelledby="guardadoTexto" hidden>
+  <img class="guardado__img" id="guardadoImg" alt="Tu tarjeta de cumpleaños">
+  <p class="guardado__texto" id="guardadoTexto">Mantén presionada la imagen para guardarla.</p>
+  <button class="boton boton--papel" id="guardadoCerrar" type="button">Cerrar</button>
+</div>
+
+<!-- Sólo con ?prueba. Va fuera de la portada para estar también bajo la tarjeta. -->
+<button class="reiniciar" id="reiniciar" type="button" hidden>reiniciar prueba</button>
+
+<div class="grano" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

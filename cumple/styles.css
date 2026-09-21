@@ -1,0 +1,859 @@
+/* Sorpresa de cumpleaños para Annie
+ *
+ * El mismo mundo que la flor (cielo azul pastel, grano de papel, Fraunces en
+ * sus dos cortes y la sans del sistema para las pistas), pero aquí el objeto
+ * es la polaroid: cada misión es el hueco de una, y la espera del backend es
+ * el revelado. El amarillo sigue reservado a lo que es regalo: la cinta que
+ * pega cada polaroid hecha y el botón de la tarjeta final.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* .aviso, .camara, .guardado… declaran display propio: sin esto el atributo
+   hidden no los escondería. */
+[hidden] { display: none !important; }
+
+:root {
+  --cielo-cenit:  #a6cfe9;
+  --cielo-medio:  #c3e0f2;
+  --cielo-bajo:   #e6f2f8;
+  --calor-rgb:  253, 242, 223;
+  --sol:          #fdeecb;
+
+  --tinta:        #21455f;
+  --tinta-suave:  #3f5d72;     /* segunda voz: 6.4:1 sobre el papel */
+  --sobre-tierra: #d9ecf7;
+  --miel-rgb:   232, 181, 63;
+
+  --papel:        #fdfcf8;
+  --pelicula:     #34495a;     /* el cuadro de una polaroid sin revelar */
+  --noche:        #0e1c27;     /* el fondo de la cámara */
+
+  --serif-display: "Fraunces Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --serif-texto:   "Fraunces Texto", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans:          ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --margen: 16px;
+  --sombra-papel: 0 14px 30px rgba(20, 55, 80, .18), 0 3px 8px rgba(20, 55, 80, .12);
+  --salida: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Las mismas instancias estáticas de Fraunces que la flor, desde la carpeta
+   de arriba: se descargan una vez para las dos páginas. */
+@font-face {
+  font-family: "Fraunces Display";
+  src: url("../assets/fonts/fraunces-display.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces Display";
+  src: url("../assets/fonts/fraunces-display-ext.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fraunces Texto";
+  src: url("../assets/fonts/fraunces-texto.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces Texto";
+  src: url("../assets/fonts/fraunces-texto-ext.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+html {
+  background: var(--cielo-cenit);   /* el rebote elástico de iOS, arriba */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--tinta);
+  font-family: var(--serif-texto);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: rgba(var(--miel-rgb), .35); color: var(--tinta); }
+
+/* El cielo va en una capa fija y no en el fondo del body: iOS ignora
+   background-attachment: fixed, y la portada es más larga que una pantalla. */
+.cielo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(90vw 46dvh at 76% 92%, rgba(var(--calor-rgb), .9) 0%, rgba(var(--calor-rgb), 0) 70%),
+    linear-gradient(180deg, var(--cielo-cenit) 0%, var(--cielo-medio) 40%, var(--cielo-bajo) 78%, var(--cielo-bajo) 100%);
+}
+
+/* ---------------------------------------------------------------- botones */
+
+.boton {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tinta);
+  color: var(--papel);
+  font: 600 1rem/1.2 var(--sans);
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: transform 160ms var(--salida), background-color 200ms ease, box-shadow 200ms ease;
+}
+.boton:hover  { background: #193850; }
+.boton:active { transform: scale(.97); }
+.boton:disabled { opacity: .55; cursor: default; transform: none; }
+.boton:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+
+.boton--suave {
+  background: transparent;
+  color: var(--tinta);
+  box-shadow: inset 0 0 0 1.5px rgba(33, 69, 95, .4);
+}
+.boton--suave:hover { background: rgba(33, 69, 95, .07); }
+
+/* Sobre la noche de la cámara. */
+.boton--papel { background: var(--papel); color: var(--tinta); }
+.boton--papel:hover { background: #fff; }
+.boton--papel:focus-visible,
+.boton--claro:focus-visible { outline-color: var(--papel); }
+.boton--claro {
+  background: transparent;
+  color: var(--papel);
+  box-shadow: inset 0 0 0 1.5px rgba(253, 252, 248, .6);
+}
+.boton--claro:hover { background: rgba(253, 252, 248, .1); }
+
+/* El único botón amarillo: el que se lleva el regalo. */
+.boton--miel {
+  background: rgb(var(--miel-rgb));
+  color: #2b2410;
+  box-shadow: 0 10px 24px rgba(20, 55, 80, .16), 0 2px 6px rgba(20, 55, 80, .1);
+}
+.boton--miel:hover { background: #dcaa35; }
+
+/* -------------------------------------------------------------- la polaroid */
+
+/* El objeto de toda la página. Marco de papel parejo arriba y a los lados, y
+   el pie ancho donde se escribe: ahí va el título de la misión y, cuando está
+   hecha, lo que Juan le contestó. El hueco es cuadrado, como el de verdad. */
+.polaroid {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;                       /* el marco lo hacen los márgenes de dentro: un %
+                                       de padding aquí mediría el contenedor, no la foto */
+  background: var(--papel);
+  border-radius: 2px;
+  box-shadow: var(--sombra-papel);
+  color: var(--tinta);
+  text-align: left;
+  rotate: var(--giro, 0deg);
+}
+
+.polaroid__hueco {
+  position: relative;
+  aspect-ratio: 1;
+  margin: 6% 6% 0;
+  overflow: hidden;
+  background: var(--pelicula);
+  border-radius: 1px;
+}
+.polaroid__hueco img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.polaroid__pie {
+  display: block;
+  min-height: 4.6rem;
+  padding: .85rem calc(6% + .15rem) 1.1rem;
+}
+
+.polaroid__titulo {
+  display: block;
+  font-family: var(--serif-display);
+  font-weight: 600;
+  font-size: 1.28rem;
+  line-height: 1.15;
+  letter-spacing: -.005em;
+  text-wrap: balance;
+}
+
+.polaroid__nota,
+.polaroid__comentario {
+  display: block;
+  margin-top: .45rem;
+  font-family: var(--serif-texto);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tinta-suave);
+  text-wrap: pretty;
+}
+.polaroid__comentario:empty { display: none; }
+
+/* La cinta que la deja pegada. Amarilla porque cada polaroid hecha es un
+   regalo que ya llegó. */
+.polaroid__cinta {
+  position: absolute;
+  z-index: 2;
+  top: -12px;
+  left: 50%;
+  width: 34%;
+  height: 26px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: rgba(var(--miel-rgb), .62);
+  box-shadow: 0 1px 2px rgba(20, 55, 80, .12);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Las pistas pequeñas: la sans del sistema, abierta, como el «tócala» de la flor. */
+.pista {
+  display: block;
+  font-family: var(--sans);
+  font-size: .74rem;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-indent: .15em;
+  text-transform: lowercase;
+}
+
+/* -------------------------------------------------------------- la portada */
+
+.portada {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: max(28px, calc(env(safe-area-inset-top) + 20px)) var(--margen)
+           max(48px, calc(env(safe-area-inset-bottom) + 32px));
+}
+
+.titulo {
+  margin: 0;
+  font-family: var(--serif-display);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 13.2vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -.018em;
+  text-wrap: balance;
+}
+
+.carta {
+  margin-top: 1.4rem;
+  max-width: 34ch;
+}
+.carta p {
+  margin: 0;
+  font-size: clamp(1.06rem, 4.5vw, 1.2rem);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.carta p + p { margin-top: .8em; }
+
+.misiones { margin-top: 3.2rem; }
+
+.misiones__titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.6rem;
+  font-family: var(--serif-display);
+  font-weight: 600;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+.misiones__cuenta {
+  font-family: var(--sans);
+  font-size: .74rem;
+  font-weight: 500;
+  letter-spacing: .3em;
+  color: var(--tinta);              /* la suave no llega a 4.5:1 sobre el cielo */
+  white-space: nowrap;
+}
+
+/* Tiradas sobre el cielo, no alineadas en columna: cada una se va un poco a
+   un lado y con su propio giro. */
+.tablero {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2.4rem;
+}
+.tablero > li { width: min(84%, 340px); }
+.tablero > li:nth-child(odd)  { justify-self: start; --giro: -1.8deg; }
+.tablero > li:nth-child(even) { justify-self: end;   --giro:  2.1deg; }
+.tablero > li:nth-child(3)    { --giro: 1.1deg; }
+.tablero > li:nth-child(4)    { --giro: -2.4deg; }
+/* Las que aún no tocan ocupan menos: la que se puede hacer ya manda. */
+.tablero > li:has(.polaroid--bloqueada) { width: min(62%, 250px); }
+.polaroid--bloqueada .polaroid__titulo { font-size: 1.1rem; }
+.polaroid--bloqueada .polaroid__nota { font-size: .92rem; }
+
+/* Disponible: película sin revelar esperando el disparo. */
+.polaroid--disponible {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 220ms var(--salida), box-shadow 220ms ease;
+}
+.polaroid--disponible:hover { transform: translateY(-4px); box-shadow: 0 20px 38px rgba(20, 55, 80, .22), 0 4px 10px rgba(20, 55, 80, .12); }
+.polaroid--disponible:active { transform: scale(.985); }
+.polaroid--disponible:focus-visible { outline: 3px solid var(--tinta); outline-offset: 4px; }
+
+.polaroid--disponible .polaroid__hueco {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(166, 207, 233, .22) 0%, rgba(166, 207, 233, 0) 60%),
+    var(--pelicula);
+}
+/* Un brillo que cruza la película despacio: está viva, esperando luz. */
+.polaroid--disponible .polaroid__hueco::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(115deg, transparent 38%, rgba(217, 236, 247, .16) 50%, transparent 62%);
+  animation: brillo-pelicula 4200ms ease-in-out infinite;
+}
+@keyframes brillo-pelicula {
+  0%, 30% { translate: -60% 0; }
+  70%, 100% { translate: 60% 0; }
+}
+.polaroid--disponible .pista { position: relative; z-index: 1; color: var(--sobre-tierra); }
+
+/* Bloqueada: todavía sellada. El papel está, el hueco es cielo lavado. */
+.polaroid--bloqueada { box-shadow: 0 6px 16px rgba(20, 55, 80, .1); }
+.polaroid--bloqueada .polaroid__hueco {
+  display: grid;
+  place-items: center;
+  background: #d6e8f3;              /* cielo lavado; el grano pone la textura */
+}
+.polaroid--bloqueada .pista { color: var(--tinta-suave); }
+.polaroid--bloqueada .polaroid__titulo { color: var(--tinta-suave); }
+
+/* Hecha: la foto, la cinta y el comentario al pie. */
+.polaroid--hecha .polaroid__cinta { opacity: 1; }
+.polaroid--hecha .polaroid__titulo {
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.polaroid--hecha .polaroid__comentario { margin-top: .4rem; color: var(--tinta); }
+
+/* Recién pegada: baja sobre el cielo y la cinta se aplasta encima. */
+.polaroid.recien { animation: pegar 900ms var(--salida) both; }
+.polaroid.recien .polaroid__cinta { animation: cinta 700ms 380ms var(--salida) both; }
+@keyframes pegar {
+  0%   { transform: translateY(-26px) scale(1.04); box-shadow: 0 34px 50px rgba(20, 55, 80, .2); }
+  100% { transform: none; }
+}
+@keyframes cinta {
+  0%   { opacity: 0; scale: 1.5; }
+  100% { opacity: 1; scale: 1; }
+}
+
+/* Cargando: la forma de las polaroids, respirando, hasta que llega el estado. */
+.polaroid--cargando { box-shadow: 0 6px 16px rgba(20, 55, 80, .08); animation: esperando 1600ms ease-in-out infinite alternate; }
+.polaroid--cargando .polaroid__hueco { background: #d6e8f3; }
+.polaroid--cargando .polaroid__pie::before,
+.polaroid--cargando .polaroid__pie::after {
+  content: "";
+  display: block;
+  height: .8rem;
+  width: 62%;
+  border-radius: 2px;
+  background: #e3eff6;
+}
+.polaroid--cargando .polaroid__pie::after { width: 84%; margin-top: .7rem; height: .6rem; }
+@keyframes esperando { from { opacity: .55; } to { opacity: 1; } }
+
+.aviso {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+.aviso__texto { margin: 0; font-size: 1.05rem; line-height: 1.55; max-width: 34ch; }
+
+.reiniciar {
+  display: block;
+  margin: 2rem auto;
+  min-height: 44px;
+  padding: 12px 16px;
+  appearance: none;
+  border: 0;
+  background: none;
+  color: var(--tinta-suave);
+  font: 500 .72rem var(--sans);
+  letter-spacing: .24em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.reiniciar:focus-visible { outline: 2px solid var(--tinta); }
+
+/* Se va hacia arriba cuando se abre la tarjeta: es el principio del cierre. */
+.cerrando .portada { animation: irse 700ms ease-in forwards; }
+@keyframes irse { to { opacity: 0; transform: translateY(-40px); } }
+
+/* ---------------------------------------------------------------- la cámara */
+
+.camara {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--noche);
+  color: var(--papel);
+  overflow: hidden;
+}
+
+.camara__video,
+.camara__captura {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Con la cámara de delante se ve en espejo, como en cualquier app de fotos;
+   app.js dibuja la captura con el mismo volteo. */
+.camara__video.espejo { transform: scaleX(-1); }
+
+.camara__flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+.camara__flash.dispara { animation: flash 420ms ease-out; }
+@keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
+
+.camara__arriba {
+  position: absolute;
+  inset: 0 0 auto;
+  padding: max(18px, calc(env(safe-area-inset-top) + 12px)) var(--margen) 64px;
+  background: linear-gradient(180deg, rgba(14, 28, 39, .82) 0%, rgba(14, 28, 39, .55) 55%, rgba(14, 28, 39, 0) 100%);
+  pointer-events: none;
+}
+.camara__titulo {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--sobre-tierra);
+}
+.camara__instruccion {
+  margin: .45rem 0 0;
+  max-width: 30ch;
+  font-family: var(--serif-texto);
+  font-size: clamp(1.12rem, 5vw, 1.35rem);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.camara__abajo {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  padding: 48px var(--margen) max(26px, calc(env(safe-area-inset-bottom) + 14px));
+  background: linear-gradient(0deg, rgba(14, 28, 39, .7) 0%, rgba(14, 28, 39, 0) 100%);
+}
+.camara__abajo--foto {
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.camara__abajo--foto .boton { width: 100%; }
+
+.redondo {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(14, 28, 39, .55);
+  color: var(--papel);
+  cursor: pointer;
+}
+.redondo svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.redondo:focus-visible { outline: 2px solid var(--papel); outline-offset: 3px; }
+
+.disparador {
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: 4px solid var(--papel);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.disparador::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--papel);
+  transition: transform 140ms var(--salida);
+}
+.disparador:active::after { transform: scale(.86); }
+.disparador:disabled { opacity: .4; cursor: default; }
+.disparador:focus-visible { outline: 2px solid var(--papel); outline-offset: 4px; }
+
+.camara__error {
+  position: absolute;
+  left: var(--margen);
+  right: var(--margen);
+  top: 50%;
+  translate: 0 -50%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px 22px 22px;
+  background: var(--papel);
+  color: var(--tinta);
+  border-radius: 3px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .4);
+}
+.camara__error-titulo {
+  margin: 0;
+  font-family: var(--serif-display);
+  font-weight: 600;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+.camara__error-texto { margin-top: .7rem; font-size: 1.02rem; line-height: 1.55; }
+.camara__error-texto p { margin: 0; }
+.camara__error-texto ol { margin: .6rem 0 0; padding-left: 1.3rem; }
+.camara__error-texto li + li { margin-top: .35rem; }
+.camara__error-texto b { font-family: var(--sans); font-size: .92em; font-weight: 600; }
+.camara__error-acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.3rem; }
+
+/* ------------------------------------------------------------ el revelado */
+
+.revelado {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: max(40px, calc(env(safe-area-inset-top) + 28px)) var(--margen)
+           max(32px, calc(env(safe-area-inset-bottom) + 24px));
+}
+.revelado::before {                 /* el mismo cielo, por encima de la portada */
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(80vw 50dvh at 50% 40%, rgba(var(--calor-rgb), .75) 0%, rgba(var(--calor-rgb), 0) 70%),
+    linear-gradient(180deg, var(--cielo-cenit) 0%, var(--cielo-medio) 45%, var(--cielo-bajo) 100%);
+}
+
+.polaroid--grande {
+  --giro: -1.4deg;
+  flex: none;
+  width: min(100%, 400px, 56dvh);
+  margin: auto 0 0;
+}
+.polaroid--grande .polaroid__pie { min-height: 5.6rem; }
+
+/* La química: un velo de película encima de la foto. El filtro de la foto y
+   la opacidad del velo los lleva app.js con la Web Animations API, porque el
+   final depende de cuándo conteste el backend. */
+.polaroid__velo {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 90% at 50% 45%, rgba(111, 140, 150, .6) 0%, rgba(52, 73, 90, 0) 70%),
+    var(--pelicula);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.revelado__linea {
+  margin: 1.6rem 0 0;
+  min-height: 1.6em;
+  font-family: var(--serif-texto);
+  font-size: 1.12rem;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 30ch;
+}
+.revelado__acciones {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 360px);
+  margin: 1.2rem 0 auto;
+}
+.revelado:not(.is-listo) .revelado__linea { margin-bottom: auto; }
+
+.revelado.is-aprobada .polaroid__cinta { animation: cinta 700ms var(--salida) both; }
+.revelado.is-aprobada .polaroid--grande { animation: asentar 900ms var(--salida); }
+@keyframes asentar {
+  0%   { transform: translateY(-14px) scale(1.03); }
+  100% { transform: none; }
+}
+.revelado.is-rechazada .polaroid--grande { --giro: 3deg; transition: rotate 600ms var(--salida); }
+
+/* ---------------------------------------------------------- la tarjeta final */
+
+.tarjeta {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: max(36px, calc(env(safe-area-inset-top) + 24px)) var(--margen)
+           max(48px, calc(env(safe-area-inset-bottom) + 32px));
+  text-align: center;
+}
+.tarjeta:focus, .revelado:focus { outline: none; }
+
+.tarjeta__titulo {
+  margin: 0;
+  max-width: 12ch;
+  font-family: var(--serif-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 12.4vw, 4.4rem);
+  line-height: 1.04;
+  letter-spacing: -.018em;
+  text-wrap: balance;
+}
+
+/* La foto de los dos en el centro, delante del sol de la flor, y las cuatro
+   polaroids de hoy alrededor, tiradas en las esquinas. */
+.collage {
+  position: relative;
+  width: min(100%, 440px);
+  aspect-ratio: 1 / 1.08;
+  margin: 1.6rem 0 1.2rem;
+}
+.collage__sol {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 78%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--calor-rgb), .95) 0%, var(--sol) 45%, rgba(253, 238, 203, 0) 72%);
+}
+.polaroid--centro {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  width: 56%;
+  --giro: -2deg;
+  translate: -50% -50%;
+  box-shadow: 0 22px 44px rgba(20, 55, 80, .26), 0 4px 10px rgba(20, 55, 80, .14);
+}
+.collage .polaroid--mini {
+  position: absolute;
+  z-index: 2;
+  width: 34%;
+}
+.polaroid--centro .polaroid__hueco { margin-bottom: 22%; }
+.polaroid--mini .polaroid__hueco   { margin-bottom: 18%; }
+.polaroid--mini .polaroid__cinta { opacity: 1; height: 14px; top: -7px; }
+.polaroid--mini:nth-of-type(2) { left: 0;    top: 2%;  --giro: -8deg; }
+.polaroid--mini:nth-of-type(3) { right: 0;   top: 5%;  --giro:  7deg; }
+.polaroid--mini:nth-of-type(4) { left: 2%;   bottom: 3%; --giro:  6deg; }
+.polaroid--mini:nth-of-type(5) { right: 1%;  bottom: 0;  --giro: -5deg; }
+
+.tarjeta__mensaje { max-width: 32ch; }
+.tarjeta__mensaje p {
+  margin: 0;
+  font-size: clamp(1.08rem, 4.6vw, 1.24rem);
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+.tarjeta__mensaje p + p { margin-top: .8em; }
+
+#guardar { margin-top: 2rem; min-width: 220px; }
+.tarjeta__nota {
+  margin: .8rem 0 0;
+  min-height: 1.4em;
+  font-family: var(--sans);
+  font-size: .86rem;
+  color: var(--tinta-suave);
+}
+
+/* El gran cierre: el sol sale, la foto de los dos cae en su sitio y las
+   polaroids del día suben una detrás de otra a rodearla. */
+.tarjeta.entra .tarjeta__titulo  { animation: subir 900ms 1500ms var(--salida) both; }
+.tarjeta.entra .collage__sol     { animation: amanecer 1600ms var(--salida) both; }
+.tarjeta.entra .polaroid--centro { animation: caer 1100ms 250ms var(--salida) both; }
+.tarjeta.entra .polaroid--mini   { animation: volar 900ms var(--salida) both; animation-delay: calc(700ms + var(--i, 0) * 160ms); }
+.tarjeta.entra .tarjeta__mensaje,
+.tarjeta.entra #guardar          { animation: subir 900ms 1900ms var(--salida) both; }
+
+@keyframes amanecer { from { opacity: 0; scale: .4; } to { opacity: 1; scale: 1; } }
+@keyframes caer {
+  from { opacity: 0; transform: translateY(-60px) scale(1.12) rotate(6deg); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes volar {
+  from { opacity: 0; transform: translateY(46vh) rotate(-14deg) scale(.8); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes subir {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------------------------------------------- plan B de «guardar tarjeta» */
+
+.guardado {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  justify-items: center;
+  gap: 14px;
+  padding: max(20px, env(safe-area-inset-top)) var(--margen) max(20px, calc(env(safe-area-inset-bottom) + 12px));
+  background: rgba(14, 28, 39, .94);
+  color: var(--papel);
+}
+.guardado__img {
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  align-self: center;
+  border-radius: 3px;
+  -webkit-touch-callout: default;   /* el menú de guardar de iOS */
+}
+.guardado__texto { margin: 0; font-size: 1.05rem; text-align: center; }
+
+/* --------------------------------------------------------------- el papel */
+
+.grano {
+  position: fixed;
+  inset: 0;
+  z-index: 25;                      /* sobre el revelado, bajo la cámara */
+  pointer-events: none;
+  opacity: .5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='.22'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------- pantalla ancha */
+
+@media (min-width: 900px) {
+  :root { --margen: 40px; }
+
+  /* La carta a la izquierda, quieta, y las polaroids en su tablero a la derecha. */
+  .portada {
+    display: grid;
+    grid-template-columns: minmax(0, 25rem) minmax(0, 1fr);
+    column-gap: clamp(3rem, 7vw, 6rem);
+    align-items: start;
+    padding-top: 10vh;
+  }
+  .saludo { position: sticky; top: 10vh; }
+  .misiones { margin-top: 0; }
+  .tablero { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem 2.4rem; }
+  .tablero > li,
+  .tablero > li:has(.polaroid--bloqueada) { width: 100%; }
+  .tablero > li:nth-child(even) { margin-top: 3.2rem; }
+
+  .tarjeta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    grid-template-areas: "collage titulo" "collage mensaje" "collage boton" "collage nota";
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: clamp(3rem, 6vw, 5rem);
+    align-content: center;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-top: 8vh;
+    text-align: left;
+  }
+  .tarjeta__titulo  { grid-area: titulo; align-self: end; }
+  .collage          { grid-area: collage; justify-self: center; align-self: center; width: min(100%, 540px); margin: 0; }
+  .tarjeta__mensaje { grid-area: mensaje; margin-top: 1.4rem; }
+  #guardar          { grid-area: boton; justify-self: start; }
+  .tarjeta__nota    { grid-area: nota; }
+}
+
+/* --------------------------------------------------------------- utilidades */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton, .polaroid--disponible, .disparador::after { transition: none; }
+  .polaroid--disponible .polaroid__hueco::after,
+  .polaroid--cargando,
+  .polaroid.recien, .polaroid.recien .polaroid__cinta,
+  .revelado.is-aprobada .polaroid__cinta, .revelado.is-aprobada .polaroid--grande,
+  .camara__flash.dispara, .cerrando .portada { animation: none; }
+  .revelado.is-rechazada .polaroid--grande { transition: none; }
+  .tarjeta.entra .tarjeta__titulo, .tarjeta.entra .collage__sol,
+  .tarjeta.entra .polaroid--centro, .tarjeta.entra .polaroid--mini,
+  .tarjeta.entra .tarjeta__mensaje, .tarjeta.entra #guardar { animation: none; }
+}
