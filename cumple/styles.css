@@ -167,7 +167,7 @@ body {
 
 .polaroid__hueco {
   position: relative;
-  aspect-ratio: 3 / 4;              /* el formato de toda foto de la página */
+  aspect-ratio: 1;                  /* cuadrada, como una polaroid de verdad */
   margin: 6% 6% 0;
   overflow: hidden;
   background: var(--pelicula);
@@ -526,9 +526,10 @@ body {
   padding: 0 var(--margen);
   container-type: size;
 }
-/* Papel de polaroid alrededor del visor, con su pie ancho. */
+/* Papel de polaroid alrededor del visor: borde fino arriba y a los lados,
+   grueso abajo, como la de verdad. */
 .camara__marco {
-  padding: 10px 10px 30px;
+  padding: 16px 16px 72px;
   background: var(--papel);
   border-radius: 2px;
   box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
@@ -536,10 +537,10 @@ body {
 .camara__visor {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1;
   background: #000;
-  width: min(100%, 52dvh);                                     /* sin container queries */
-  width: min(calc(100cqw - 20px), calc((100cqh - 40px) * .75));
+  width: min(100%, 44dvh);                                     /* sin container queries */
+  width: min(calc(100cqw - 32px), calc(100cqh - 88px));
 }
 
 /* Video y captura con la misma caja y el mismo cover centrado: app.js recorta
@@ -568,12 +569,14 @@ body {
 
 /* La mitad IZQUIERDA de un corazón, con el lado recto pegado al borde derecho
    del visor: en la tarjeta, la foto de ella va a la izquierda y ese borde toca
-   la de Juan. Blanco con sombra para leerse sobre cualquier fondo. */
+   la de Juan. Blanco con sombra para leerse sobre cualquier fondo. Se mide
+   por el alto: en el visor cuadrado, una mano cerrada en C a distancia de
+   selfie ocupa más o menos esto. */
 .guia {
   position: absolute;
   right: 0;
-  top: 56%;
-  width: 48%;                       /* cabe una mano cerrada en C a distancia de selfie */
+  top: 55%;
+  height: 62%;
   aspect-ratio: 112 / 184;
   translate: 0 -50%;
   pointer-events: none;
@@ -605,6 +608,21 @@ body {
   letter-spacing: .08em;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+}
+
+.camara__diag {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  margin: 0;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .6);
+  color: #fff;
+  font: 600 .66rem/1.3 var(--sans);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
 }
 
 .camara__abajo {
@@ -727,7 +745,7 @@ body {
 .polaroid--grande {
   --giro: -1.4deg;
   flex: none;
-  width: min(100%, 380px, 44dvh);
+  width: min(100%, 400px, 52dvh);
   margin: auto 0 0;
 }
 .polaroid--grande .polaroid__pie { min-height: 5.6rem; }
@@ -803,7 +821,7 @@ body {
 .collage {
   position: relative;
   width: min(100%, 440px);
-  aspect-ratio: 1 / 1.28;          /* las polaroids son 3:4: más altas que anchas */
+  aspect-ratio: 1 / 1.08;
   margin: 1.6rem 0 1.2rem;
 }
 .collage__sol {
@@ -845,8 +863,8 @@ body {
 .collage--tres .polaroid--mini:nth-of-type(3) { right: -1%; top: 33%; }
 .collage--tres .polaroid--mini:nth-of-type(4) { left: 3%; bottom: 1%; --giro: 5deg; }
 
-/* El corazón partido. Dos medias polaroids 3:4 (no cuadradas: en una selfie
-   la mano cae cerca del borde) sin marco en el lado que se tocan, así que
+/* El corazón partido. Dos medias polaroids cuadradas, como todas las fotos,
+   sin marco en el lado que se tocan, así que
    al juntarse forman un solo papel y un solo corazón. La sombra va en el
    conjunto (drop-shadow) para que no se pinte una mitad sobre la otra. */
 .corazon {
@@ -864,7 +882,7 @@ body {
 }
 .corazon__mitad--juan { padding: 7% 7% 0 0; }
 .corazon__foto {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1;
   overflow: hidden;
   background: var(--pelicula);
 }

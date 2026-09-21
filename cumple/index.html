@@ -17,7 +17,7 @@
 <link rel="preload" href="fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
 <!-- ?v= se sube en cada cambio de CSS o JS: Pages cachea 10 min y un app.js nuevo con un styles.css viejo se rompe. -->
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -83,8 +83,8 @@
     <p class="camara__instruccion" id="camInstruccion"></p>
   </div>
 
-  <!-- El visor es el hueco de una polaroid, 3:4 como todas las fotos de la
-       página: lo que se ve aquí es exactamente lo que se manda. -->
+  <!-- El visor es el hueco cuadrado de una polaroid, como todas las fotos de
+       la página: lo que se ve aquí es exactamente lo que se manda. -->
   <div class="camara__centro">
     <div class="camara__marco">
       <div class="camara__visor">
@@ -96,6 +96,8 @@
           <span class="guia__texto">tu mano aquí</span>
         </div>
         <div class="camara__flash" id="flash" aria-hidden="true"></div>
+        <!-- Sólo con ?prueba: medidas reales del stream, para diagnosticar el zoom. -->
+        <p class="camara__diag" id="diag" hidden></p>
       </div>
     </div>
   </div>
@@ -193,6 +195,6 @@
 
 <div class="grano" aria-hidden="true"></div>
 
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

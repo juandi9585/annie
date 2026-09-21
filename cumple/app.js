@@ -24,7 +24,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   var params  = new URLSearchParams(location.search);
   var PRUEBA  = params.has('prueba');
   var TIMEOUT_MS = 60000;
-  var FOTO_W = 960, FOTO_H = 1280; // la foto que se manda: 3:4 vertical, como el visor
+  var FOTO_LADO = 1080;            // la foto que se manda: cuadrada, como el visor
   var CALIDAD    = 0.85;          // JPEG
 
   /* Lo que se lee mientras se revela. El backend se despierta en frío y a
@@ -270,8 +270,11 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     var n = pedido;
     dispararBtn.disabled = true;
     navigator.mediaDevices.getUserMedia({
-      // Se pide en vertical, pero el recorte de disparar() funciona venga como venga.
-      video: { facingMode: facing, aspectRatio: { ideal: 3 / 4 }, height: { ideal: 1920 } },
+      // El modo nativo del sensor, sin recortes de Chrome: su resizeMode por
+      // defecto (crop-and-scale) recortaba para cumplir aspecto o medidas, y con
+      // nuestro recorte encima la cara llenaba la foto. Sin aspectRatio ni
+      // height a propósito. Safari ignora resizeMode, y está bien.
+      video: { facingMode: facing, width: { ideal: 1280 }, resizeMode: 'none' },
       audio: false
     }).then(function (s) {
       if (n !== pedido || pantalla !== 'camara') { s.getTracks().forEach(function (t) { t.stop(); }); return; }
@@ -280,6 +283,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       var ajustes = pista && pista.getSettings ? pista.getSettings() : {};
       espejo = (ajustes.facingMode || facing) === 'user';
       video.classList.toggle('espejo', espejo);
+      alejar(pista, ajustes);
       video.srcObject = s;
       contarCamaras();
       dispararBtn.disabled = false;
@@ -291,6 +295,33 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       errorCamara(e && e.name);
     });
   }
+
+  /* Algunos Android abren la cámara con zoom: se pide el mínimo. */
+  function alejar(pista, ajustes) {
+    var caps = pista && pista.getCapabilities ? pista.getCapabilities() : null;
+    var min = caps && caps.zoom ? caps.zoom.min : null;
+    if (min != null && ajustes.zoom > min) {
+      try {
+        pista.applyConstraints({ advanced: [{ zoom: min }] }).then(diagnostico, function () {});
+      } catch (e) { /* sin zoom, nada que hacer */ }
+    }
+  }
+
+  /* Sólo en ?prueba: tamaño real del stream, zoom actual/mínimo y resizeMode,
+     para que Juan lo mande en una captura. */
+  var diag = $('diag');
+  function diagnostico() {
+    if (!PRUEBA || !stream) return;
+    var pista = stream.getVideoTracks()[0];
+    var a = pista && pista.getSettings ? pista.getSettings() : {};
+    var caps = pista && pista.getCapabilities ? pista.getCapabilities() : null;
+    diag.textContent = video.videoWidth + '×' + video.videoHeight +
+      ' · zoom ' + (a.zoom != null ? a.zoom : '—') + '/' + (caps && caps.zoom ? caps.zoom.min : '—') +
+      ' · resize ' + (a.resizeMode || '—');
+    diag.hidden = false;
+  }
+  video.addEventListener('loadedmetadata', diagnostico);
+  video.addEventListener('resize', diagnostico);
 
   function contarCamaras() {
     if (!navigator.mediaDevices.enumerateDevices) return;
@@ -342,25 +373,22 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     guia.hidden = !guiaActiva;
   }
 
-  /* La región del frame que enseña el visor: un 3:4 centrado, con la misma
-     cuenta que object-fit: cover. Si el stream llega apaisado (Android), se
-     queda con la franja vertical del centro; si llega más alto, con la del
-     medio. */
-  function recorte34(w, h) {
-    if (w / h > 3 / 4) { var sw = h * 3 / 4; return { x: (w - sw) / 2, y: 0, w: sw, h: h }; }
-    var sh = w * 4 / 3;
-    return { x: 0, y: (h - sh) / 2, w: w, h: sh };
+  /* La región del frame que enseña el visor: el cuadrado centrado, la misma
+     cuenta que object-fit: cover en una caja cuadrada. Venga el stream
+     apaisado o vertical, es el único recorte. */
+  function recorteCuadrado(w, h) {
+    var lado = Math.min(w, h);
+    return { x: (w - lado) / 2, y: (h - lado) / 2, lado: lado };
   }
 
   function disparar() {
     if (!stream || !video.videoWidth) return;
-    var r = recorte34(video.videoWidth, video.videoHeight);
+    var r = recorteCuadrado(video.videoWidth, video.videoHeight);
     var c = document.createElement('canvas');
-    c.width = Math.min(FOTO_W, Math.round(r.w));
-    c.height = Math.round(c.width * 4 / 3);
+    c.width = c.height = Math.min(FOTO_LADO, Math.round(r.lado));
     var ctx = c.getContext('2d');
     if (espejo) { ctx.translate(c.width, 0); ctx.scale(-1, 1); }   // lo que ve es lo que se manda
-    ctx.drawImage(video, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+    ctx.drawImage(video, r.x, r.y, r.lado, r.lado, 0, 0, c.width, c.height);
     foto = c.toDataURL('image/jpeg', CALIDAD);
     captura.src = foto;
     captura.hidden = false;
@@ -680,12 +708,12 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
 
     /* Dos composiciones: la de siempre, y con el corazón, donde la órbita
        sube y encoge para dejarle al par la mitad de abajo. */
-    // Las polaroids son 3:4, más altas que anchas: los sitios están medidos para eso.
+    // Polaroids cuadradas con el pie ancho: los sitios están medidos para eso.
     var L = par
-      ? { tituloPx: 84, tituloY: 150, tituloPaso: 92, cy: 590, centro: 400, mini: 230,
-          sitios: [[235, 440, -8], [850, 590, 7], [250, 730, 5]], textoTop: 1440, textoTam: 42 }
-      : { tituloPx: 92, tituloY: 210, tituloPaso: 100, cy: 860, centro: 540, mini: 310,
-          sitios: [[245, 590, -8], [840, 620, 7], [240, 1070, 6], [845, 1050, -5]], textoTop: 1330, textoTam: 46 };
+      ? { tituloPx: 84, tituloY: 150, tituloPaso: 92, cy: 590, centro: 400, mini: 250,
+          sitios: [[235, 450, -8], [850, 600, 7], [250, 765, 5]], textoTop: 1400, textoTam: 42, parY: 1125 }
+      : { tituloPx: 92, tituloY: 210, tituloPaso: 100, cy: 860, centro: 560, mini: 330,
+          sitios: [[250, 560, -8], [835, 590, 7], [245, 1140, 6], [840, 1110, -5]], textoTop: 1330, textoTam: 46 };
 
     return Promise.all([fuentes, imgs]).then(function (r) {
       var fotos = r[1];
@@ -730,7 +758,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       polaroidEnLienzo(ctx, fotos[0], cx, cy, L.centro, -2, false);
       if (par) {
         var ps = fotos.slice(1 + orbita.length);
-        parEnLienzo(ctx, ps[0], ps[1], cx, 1135, 620, SANS);
+        parEnLienzo(ctx, ps[0], ps[1], cx, L.parY, 620, SANS);
         ctx.fillStyle = '#21455f';
       }
 
@@ -779,7 +807,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   }
 
   function polaroidEnLienzo(ctx, img, x, y, w, grados, cinta) {
-    var pad = w * 0.06, lado = w - pad * 2, alto = lado * 4 / 3, h = pad + alto + w * (cinta ? 0.16 : 0.2);
+    var pad = w * 0.06, lado = w - pad * 2, alto = lado, h = pad + alto + w * (cinta ? 0.16 : 0.2);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(grados * Math.PI / 180);
@@ -808,9 +836,9 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
   }
 
-  /* El corazón en el lienzo: un solo papel, las dos fotos 3:4 tocándose. */
+  /* El corazón en el lienzo: un solo papel, las dos fotos cuadradas tocándose. */
   function parEnLienzo(ctx, ella, juan, x, y, ancho, sans) {
-    var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw * 4 / 3, pie = ancho * 0.09;
+    var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw, pie = ancho * 0.11;
     var h = pad + fh + pie;
     ctx.save();
     ctx.translate(x, y);
