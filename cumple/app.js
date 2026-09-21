@@ -302,26 +302,10 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     var min = caps && caps.zoom ? caps.zoom.min : null;
     if (min != null && ajustes.zoom > min) {
       try {
-        pista.applyConstraints({ advanced: [{ zoom: min }] }).then(diagnostico, function () {});
+        pista.applyConstraints({ advanced: [{ zoom: min }] }).catch(function () {});
       } catch (e) { /* sin zoom, nada que hacer */ }
     }
   }
-
-  /* Sólo en ?prueba: tamaño real del stream, zoom actual/mínimo y resizeMode,
-     para que Juan lo mande en una captura. */
-  var diag = $('diag');
-  function diagnostico() {
-    if (!PRUEBA || !stream) return;
-    var pista = stream.getVideoTracks()[0];
-    var a = pista && pista.getSettings ? pista.getSettings() : {};
-    var caps = pista && pista.getCapabilities ? pista.getCapabilities() : null;
-    diag.textContent = video.videoWidth + '×' + video.videoHeight +
-      ' · zoom ' + (a.zoom != null ? a.zoom : '—') + '/' + (caps && caps.zoom ? caps.zoom.min : '—') +
-      ' · resize ' + (a.resizeMode || '—');
-    diag.hidden = false;
-  }
-  video.addEventListener('loadedmetadata', diagnostico);
-  video.addEventListener('resize', diagnostico);
 
   function contarCamaras() {
     if (!navigator.mediaDevices.enumerateDevices) return;
