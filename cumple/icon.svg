@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Una polaroid, el objeto de esta página: marco crema con el pie ancho,
+       cielo pastel dentro y el sol amarillo. Sin texto ni giro: a 16 px sólo
+       sobreviven formas, y cada canto cae en un píxel entero (4 unidades =
+       1 px a 16, 2 px a 32). El canto en tinta es para que el marco no
+       desaparezca sobre una pestaña blanca. -->
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a6cfe9"/>
+      <stop offset="1" stop-color="#d9ecf7"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="6" width="44" height="52" rx="2" fill="#fdfcf8" stroke="#21455f" stroke-width="4"/>
+  <rect x="16" y="12" width="32" height="32" fill="url(#cielo)"/>
+  <circle cx="38" cy="22" r="6" fill="#e8b53f"/>
+</svg>

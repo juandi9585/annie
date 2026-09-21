@@ -1,7 +1,8 @@
 /* Sorpresa de cumpleaños para Annie
  *
- * El mismo mundo que la flor (cielo azul pastel, grano de papel, Fraunces en
- * sus dos cortes y la sans del sistema para las pistas), pero aquí el objeto
+ * El mismo mundo que la flor (cielo azul pastel, grano de papel y la sans del
+ * sistema para las pistas), con letra propia: Sansita Swashed para el grito y
+ * Playpen Sans para lo que se lee. Aquí el objeto
  * es la polaroid: cada misión es el hueco de una, y la espera del backend es
  * el revelado. El amarillo sigue reservado a lo que es regalo: la cinta que
  * pega cada polaroid hecha y el botón de la tarjeta final.
@@ -22,6 +23,8 @@
 
   --tinta:        #21455f;
   --tinta-suave:  #3f5d72;     /* segunda voz: 6.4:1 sobre el papel */
+  --tinta-cielo:  #34536a;     /* la misma voz sobre el cielo: 4.9:1 aun en el
+                                  celeste más oscuro, donde la suave no llega */
   --sobre-tierra: #d9ecf7;
   --miel-rgb:   232, 181, 63;
 
@@ -29,8 +32,8 @@
   --pelicula:     #34495a;     /* el cuadro de una polaroid sin revelar */
   --noche:        #0e1c27;     /* el fondo de la cámara */
 
-  --serif-display: "Fraunces Display", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --serif-texto:   "Fraunces Texto", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --grito:         "Sansita Swashed", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --texto:         "Playpen Sans", ui-rounded, system-ui, sans-serif;
   --sans:          ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --margen: 16px;
@@ -38,39 +41,29 @@
   --salida: cubic-bezier(.16, 1, .3, 1);
 }
 
-/* Las mismas instancias estáticas de Fraunces que la flor, desde la carpeta
-   de arriba: se descargan una vez para las dos páginas. */
+/* Dos letras, autoalojadas en fonts/ con su licencia OFL al lado:
+     Sansita Swashed ExtraBold — el grito y los títulos. Gruesa, con remates
+       caligráficos en algunas mayúsculas: celebra sin ser infantil. No aguanta
+       tracking negativo (los adornos chocan), así que va siempre a 0.
+     Playpen Sans — la carta, los comentarios y los textos. Letra de mano
+       legible; es ancha, y por eso sus medidas son algo más cortas.
+   Las etiquetas pequeñas (pasos, pistas, contador) siguen en la sans del
+   sistema. Corte latin: cubre á é í ó ú ñ ü ¡ ¿. */
 @font-face {
-  font-family: "Fraunces Display";
-  src: url("../assets/fonts/fraunces-display.woff2") format("woff2");
-  font-weight: 600; font-style: normal; font-display: swap;
+  font-family: "Sansita Swashed";
+  src: url("fonts/sansita-swashed-800.woff2") format("woff2");
+  font-weight: 800; font-style: normal; font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
                  U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
                  U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: "Fraunces Display";
-  src: url("../assets/fonts/fraunces-display-ext.woff2") format("woff2");
-  font-weight: 600; font-style: normal; font-display: swap;
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
-                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
-                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: "Fraunces Texto";
-  src: url("../assets/fonts/fraunces-texto.woff2") format("woff2");
+  font-family: "Playpen Sans";
+  src: url("fonts/playpen-sans-400.woff2") format("woff2");
   font-weight: 400; font-style: normal; font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
                  U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
                  U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: "Fraunces Texto";
-  src: url("../assets/fonts/fraunces-texto-ext.woff2") format("woff2");
-  font-weight: 400; font-style: normal; font-display: swap;
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
-                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
-                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 html {
@@ -82,7 +75,7 @@ body {
   margin: 0;
   min-height: 100dvh;
   color: var(--tinta);
-  font-family: var(--serif-texto);
+  font-family: var(--texto);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -193,13 +186,14 @@ body {
   padding: .85rem calc(6% + .15rem) 1.1rem;
 }
 
+/* El título del pie va a mano (Playpen), como se rotula una polaroid de
+   verdad. En Sansita, a este tamaño, la L con adorno se leía «£a». */
 .polaroid__titulo {
   display: block;
-  font-family: var(--serif-display);
-  font-weight: 600;
-  font-size: 1.28rem;
-  line-height: 1.15;
-  letter-spacing: -.005em;
+  font-family: var(--texto);
+  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1.25;
   text-wrap: balance;
 }
 
@@ -207,7 +201,7 @@ body {
 .polaroid__comentario {
   display: block;
   margin-top: .45rem;
-  font-family: var(--serif-texto);
+  font-family: var(--texto);
   font-size: 1rem;
   line-height: 1.5;
   color: var(--tinta-suave);
@@ -255,46 +249,112 @@ body {
 
 .titulo {
   margin: 0;
-  font-family: var(--serif-display);
-  font-weight: 600;
+  font-family: var(--grito);
+  font-weight: 800;
   font-size: clamp(2.6rem, 13.2vw, 4.6rem);
-  line-height: 1.02;
-  letter-spacing: -.018em;
+  line-height: 1.08;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
+/* Tres voces en el saludo, cada una con un solo trabajo: el grito (display),
+   la carta (texto, en su voz, más grande que un párrafo) y las reglas (la
+   sans del sistema, pequeña y espaciada, como las pistas de la flor). El
+   ritmo: la carta pegada al grito, las reglas a un paso más, y el tablero
+   bien separado de todo el saludo. */
 .carta {
-  margin-top: 1.4rem;
-  max-width: 34ch;
-}
-.carta p {
-  margin: 0;
-  font-size: clamp(1.06rem, 4.5vw, 1.2rem);
-  line-height: 1.6;
+  margin: 1.1rem 0 0;
+  max-width: 21ch;
+  font-size: clamp(1.32rem, 5.8vw, 1.6rem);
+  line-height: 1.4;
   text-wrap: pretty;
 }
-.carta p + p { margin-top: .8em; }
 
-.misiones { margin-top: 3.2rem; }
+.reglas {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.05rem;
+  counter-reset: regla;
+}
+.reglas li {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  column-gap: .85rem;
+  row-gap: .2rem;
+  counter-increment: regla;
+}
+/* role="list" en el HTML: Safari le quita la semántica de lista a un <ol>
+   con list-style: none, y VoiceOver dejaría de contar los pasos. */
 
-.misiones__titulo {
+/* El número es el acento: en tinta y en la display, la única cifra con voz
+   de la página. Nunca amarillo: el amarillo es de los regalos. */
+.reglas li::before {
+  content: counter(regla);
+  grid-row: 1 / span 2;
+  font-family: var(--grito);
+  font-weight: 800;
+  font-size: 1.55rem;
+  line-height: .9;
+  font-variant-numeric: lining-nums;
+  color: var(--tinta);
+  text-align: right;
+}
+.reglas__paso {
+  font-family: var(--sans);
+  font-size: .74rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--tinta-cielo);
+}
+.reglas__linea {
+  font-family: var(--sans);
+  font-size: .95rem;
+  line-height: 1.4;
+  color: var(--tinta-cielo);
+}
+
+.misiones { margin-top: 3.4rem; }
+
+.misiones__cabecera {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;                  /* a 320 px la promesa baja, no aprieta el título */
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
   margin: 0 0 1.6rem;
-  font-family: var(--serif-display);
-  font-weight: 600;
+}
+.misiones__titulo {
+  margin: 0;
+  font-family: var(--grito);
+  font-weight: 800;
   font-size: 1.6rem;
   line-height: 1.1;
 }
-.misiones__cuenta {
+/* El contador y, debajo, la promesa de la tarjeta: la misma voz de las reglas. */
+.misiones__meta {
+  display: grid;
+  justify-items: end;
+  gap: .2rem;
+  margin: 0;
   font-family: var(--sans);
+  text-align: right;
+}
+.misiones__cuenta {
   font-size: .74rem;
-  font-weight: 500;
-  letter-spacing: .3em;
+  font-weight: 600;
+  letter-spacing: .2em;
   color: var(--tinta);              /* la suave no llega a 4.5:1 sobre el cielo */
   white-space: nowrap;
+}
+.misiones__cuenta:empty { display: none; }
+.misiones__promesa {
+  font-size: .82rem;
+  line-height: 1.3;
+  color: var(--tinta-cielo);
 }
 
 /* Tiradas sobre el cielo, no alineadas en columna: cada una se va un poco a
@@ -313,7 +373,7 @@ body {
 .tablero > li:nth-child(4)    { --giro: -2.4deg; }
 /* Las que aún no tocan ocupan menos: la que se puede hacer ya manda. */
 .tablero > li:has(.polaroid--bloqueada) { width: min(62%, 250px); }
-.polaroid--bloqueada .polaroid__titulo { font-size: 1.1rem; }
+.polaroid--bloqueada .polaroid__titulo { font-size: 1.05rem; }
 .polaroid--bloqueada .polaroid__nota { font-size: .92rem; }
 
 /* Disponible: película sin revelar esperando el disparo. */
@@ -481,7 +541,7 @@ body {
 .camara__instruccion {
   margin: .45rem 0 0;
   max-width: 30ch;
-  font-family: var(--serif-texto);
+  font-family: var(--texto);
   font-size: clamp(1.12rem, 5vw, 1.35rem);
   line-height: 1.4;
   text-wrap: pretty;
@@ -570,8 +630,8 @@ body {
 }
 .camara__error-titulo {
   margin: 0;
-  font-family: var(--serif-display);
-  font-weight: 600;
+  font-family: var(--grito);
+  font-weight: 800;
   font-size: 1.45rem;
   line-height: 1.15;
 }
@@ -629,7 +689,7 @@ body {
 .revelado__linea {
   margin: 1.6rem 0 0;
   min-height: 1.6em;
-  font-family: var(--serif-texto);
+  font-family: var(--texto);
   font-size: 1.12rem;
   line-height: 1.5;
   text-align: center;
@@ -664,15 +724,18 @@ body {
   text-align: center;
 }
 .tarjeta:focus, .revelado:focus { outline: none; }
+/* Las mitades del corazón esperan fuera de su sitio y las polaroids giradas
+   rozan el borde: sin esto sobresalen y en iOS la página baila de lado. */
+.tarjeta, .portada { overflow-x: clip; }
 
 .tarjeta__titulo {
   margin: 0;
   max-width: 12ch;
-  font-family: var(--serif-display);
-  font-weight: 600;
+  font-family: var(--grito);
+  font-weight: 800;
   font-size: clamp(2.5rem, 12.4vw, 4.4rem);
-  line-height: 1.04;
-  letter-spacing: -.018em;
+  line-height: 1.08;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -865,6 +928,12 @@ body {
     padding-top: 10vh;
   }
   .saludo { position: sticky; top: 10vh; }
+  /* Sansita es más ancha que la letra anterior: a 4.6rem «cumpleaños,» se
+     salía de su columna de 25rem. */
+  .titulo { font-size: clamp(2.6rem, 4.6vw, 4.1rem); }
+  /* En la columna, la jerarquía nueva respira: más aire entre las tres voces. */
+  .carta  { margin-top: 1.5rem; }
+  .reglas { margin-top: 2.6rem; gap: 1.35rem; }
   .misiones { margin-top: 0; }
   .tablero { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem 2.4rem; }
   .tablero > li,
@@ -883,7 +952,7 @@ body {
     padding-top: 8vh;
     text-align: left;
   }
-  .tarjeta__titulo  { grid-area: titulo; align-self: end; }
+  .tarjeta__titulo  { grid-area: titulo; align-self: end; font-size: clamp(2.4rem, 4.3vw, 3.9rem); }
   .collage          { grid-area: collage; justify-self: center; align-self: center; width: min(100%, 540px); margin: 0; }
   .tarjeta__mensaje { grid-area: mensaje; margin-top: 1.4rem; }
   #guardar          { grid-area: boton; justify-self: start; }

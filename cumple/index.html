@@ -13,9 +13,9 @@
 <meta property="og:url" content="https://juandi9585.github.io/annie/cumple/">
 <meta name="theme-color" content="#a6cfe9">
 
-<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
-<link rel="preload" href="../assets/fonts/fraunces-display.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="../assets/fonts/fraunces-texto.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -29,9 +29,14 @@
   <!-- ══════════════════════════════════════════════════════════════════════
        EL MENSAJE.  Es lo único de este archivo que hace falta tocar.
 
+       Tres voces, cada una con su papel:
        · titulo — el grito. Dos líneas como mucho.
-       · <p>    — la explicación, en tu voz. Puedes añadir o quitar párrafos
-                  <p> dentro de <div class="carta"> sin tocar CSS ni JS.
+       · carta  — una o dos frases tuyas, cortas. Es lo único que se lee
+                  como carta: si crece mucho, deja de ser una frase.
+       · reglas — los pasos. Cada <li> lleva un título corto (sale en
+                  mayúsculas pequeñas; escríbelo normal) y una línea que lo
+                  explica. Los números los pone el CSS solos: puedes añadir
+                  o quitar pasos sin tocar nada más.
        · &nbsp; — espacio que no se parte: úsalo donde te moleste un corte.
 
        Las misiones NO van aquí: sus títulos e instrucciones vienen del
@@ -40,18 +45,30 @@
 
     <h1 class="titulo">¡Feliz cumpleaños, Annie!</h1>
 
-    <div class="carta">
-      <p>Hoy te van a ir llegando cosas a lo largo del día, bebi. Cada una trae una misión: una foto que tienes que hacer aquí mismo, en vivo, con la cámara de esta página.</p>
-      <p>Mi IA la revisa y te dice si la clavaste. Y cada foto que hagas me llega a mí, allá en Venezuela: así estoy un poquito contigo en cada una.</p>
-      <p>Cuando las completes todas, se abre tu tarjeta.</p>
-    </div>
+    <p class="carta">Hoy te van llegando cosas, bebi. Cada una trae una misión.</p>
+
+    <ol class="reglas" role="list">
+      <li><span class="reglas__paso">Llega algo</span>
+          <span class="reglas__linea">ábrelo: es tuyo</span></li>
+      <li><span class="reglas__paso">Foto en vivo</span>
+          <span class="reglas__linea">aquí mismo, con esta cámara</span></li>
+      <li><span class="reglas__paso">Me llega a mí</span>
+          <span class="reglas__linea">hasta Venezuela</span></li>
+    </ol>
 
   <!-- ═══════════════════════════ fin del mensaje ══════════════════════ -->
 
   </header>
 
   <section class="misiones" aria-labelledby="misionesTitulo">
-    <h2 class="misiones__titulo" id="misionesTitulo">Tus misiones <span class="misiones__cuenta" id="cuenta"></span></h2>
+    <div class="misiones__cabecera">
+      <h2 class="misiones__titulo" id="misionesTitulo">Tus misiones</h2>
+      <!-- El contador lo escribe app.js; la promesa de debajo es tuya. -->
+      <p class="misiones__meta">
+        <span class="misiones__cuenta" id="cuenta"></span>
+        <span class="misiones__promesa">al final, tu tarjeta</span>
+      </p>
+    </div>
 
     <div class="aviso" id="aviso" role="alert" hidden>
       <p class="aviso__texto" id="avisoTexto"></p>

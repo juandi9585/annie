@@ -625,12 +625,22 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
      que se la pueda guardar en el carrete. Se prepara nada más abrirse la
      tarjeta: así, al tocar «Guardar», navigator.share() sale dentro del toque,
      que es lo que exige iOS. */
+  /* Las familias del lienzo salen de las mismas variables CSS que la página
+     (--grito, --texto, --sans): cambiar de letra es cambiarla
+     en styles.css y nada más. */
+  function familia(variable, reserva) {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || reserva;
+  }
+
   function dibujarTarjeta() {
     var f = estado.final;
+    var DISPLAY = familia('--grito', 'sans-serif');
+    var TEXTO = familia('--texto', 'sans-serif');
+    var SANS = familia('--sans', 'sans-serif');
     var W = 1080, H = 1920;
     var fuentes = Promise.all([
-      document.fonts.load('600 80px "Fraunces Display"'),
-      document.fonts.load('400 40px "Fraunces Texto"')
+      document.fonts.load('800 80px ' + DISPLAY),
+      document.fonts.load('400 40px ' + TEXTO)
     ]).catch(function () {}).then(function () { return document.fonts.ready; });
     var par = parDelCorazon();
     var orbita = fotosDelDia();
@@ -671,7 +681,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       ctx.fillStyle = '#21455f';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
-      ctx.font = '600 ' + L.tituloPx + 'px "Fraunces Display", Georgia, serif';
+      ctx.font = '800 ' + L.tituloPx + 'px ' + DISPLAY;
       // Equilibra el título: el ancho más estrecho que no añade líneas, para
       // que no quede una palabra sola abajo.
       var lineasTitulo = partir(ctx, f.titulo || '', 900);
@@ -689,7 +699,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       polaroidEnLienzo(ctx, fotos[0], cx, cy, L.centro, -2, false);
       if (par) {
         var ps = fotos.slice(1 + orbita.length);
-        parEnLienzo(ctx, ps[0], ps[1], par.ella.mitad === 'izquierda', cx, 1135, 620);
+        parEnLienzo(ctx, ps[0], ps[1], par.ella.mitad === 'izquierda', cx, 1135, 620, SANS);
         ctx.fillStyle = '#21455f';
       }
 
@@ -697,7 +707,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       var parrafos = f.mensaje || [];
       var top = L.textoTop, fondo = 1800, tam = L.textoTam, bloques, alto;
       do {
-        ctx.font = '400 ' + tam + 'px "Fraunces Texto", Georgia, serif';
+        ctx.font = '400 ' + tam + 'px ' + TEXTO;
         bloques = parrafos.map(function (p) { return partir(ctx, p, 860); });
         alto = bloques.reduce(function (s, b) { return s + b.length * tam * 1.5; }, 0) + (bloques.length - 1) * tam * 0.7;
         tam -= 2;
@@ -709,7 +719,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         y += tam * 0.7;
       });
 
-      ctx.font = '500 26px ui-sans-serif, system-ui, -apple-system, sans-serif';
+      ctx.font = '500 26px ' + SANS;
       ctx.fillStyle = '#3f5d72';
       if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '8px';
       ctx.fillText('22 · 09', cx, 1868);
@@ -776,7 +786,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   }
 
   /* El corazón en el lienzo: un solo papel, las dos fotos 3:4 tocándose. */
-  function parEnLienzo(ctx, ella, juan, espejo, x, y, ancho) {
+  function parEnLienzo(ctx, ella, juan, espejo, x, y, ancho, sans) {
     var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw * 4 / 3, pie = ancho * 0.09;
     var h = pad + fh + pie;
     ctx.save();
@@ -790,7 +800,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.shadowColor = 'transparent';
     fotoCover(ctx, ella, -ancho / 2 + pad, -h / 2 + pad, fw, fh, espejo);
     fotoCover(ctx, juan, 0, -h / 2 + pad, fw, fh, false);
-    ctx.font = '600 22px ui-sans-serif, system-ui, -apple-system, sans-serif';
+    ctx.font = '600 22px ' + sans;
     ctx.fillStyle = '#3f5d72';
     ctx.textAlign = 'center';
     if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '5px';
