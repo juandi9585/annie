@@ -167,6 +167,7 @@ body {
 
 .polaroid__hueco {
   position: relative;
+  display: block;                   /* dentro de un <button> es un <span>: sin esto pierde el marco */
   aspect-ratio: 1;                  /* cuadrada, como una polaroid de verdad */
   margin: 6% 6% 0;
   overflow: hidden;
