@@ -17,7 +17,7 @@
 <link rel="preload" href="fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
 <!-- ?v= se sube en cada cambio de CSS o JS: Pages cachea 10 min y un app.js nuevo con un styles.css viejo se rompe. -->
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -167,12 +167,12 @@
   <!-- El corazón partido: la mitad de ella (su misión del corazón) y la de
        Juan, que se juntan. Sólo aparece si el backend manda final.mitad. -->
   <figure class="corazon" id="corazon" aria-label="Un corazón entre los dos: tu mitad desde España y la de Juan desde Venezuela" hidden>
-    <div class="corazon__mitad">
-      <div class="corazon__foto"><img id="mitadElla" alt="Tu mitad del corazón"></div>
+    <div class="polaroid corazon__mitad corazon__mitad--ella">
+      <div class="polaroid__hueco"><img id="mitadElla" alt="Tu mitad del corazón"></div>
       <span class="corazon__lugar">España</span>
     </div>
-    <div class="corazon__mitad corazon__mitad--juan">
-      <div class="corazon__foto"><img id="mitadJuan" alt="La otra mitad, la de Juan"></div>
+    <div class="polaroid corazon__mitad corazon__mitad--juan">
+      <div class="polaroid__hueco"><img id="mitadJuan" alt="La otra mitad, la de Juan"></div>
       <span class="corazon__lugar">Venezuela</span>
     </div>
   </figure>
@@ -193,6 +193,6 @@
 
 <div class="grano" aria-hidden="true"></div>
 
-<script src="app.js?v=8"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>

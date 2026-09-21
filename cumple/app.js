@@ -790,7 +790,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     return lineas;
   }
 
-  function polaroidEnLienzo(ctx, img, x, y, w, grados, cinta) {
+  function polaroidEnLienzo(ctx, img, x, y, w, grados, cinta, leyenda, sans) {
     var pad = w * 0.06, lado = w - pad * 2, alto = lado, h = pad + alto + w * (cinta ? 0.16 : 0.2);
     ctx.save();
     ctx.translate(x, y);
@@ -803,6 +803,14 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.shadowColor = 'transparent';
     var ix = -w / 2 + pad, iy = -h / 2 + pad;
     fotoCover(ctx, img, ix, iy, lado, alto);
+    if (leyenda) {                   // en el pie grueso, como en la página
+      ctx.font = '600 20px ' + sans;
+      ctx.fillStyle = '#3f5d72';
+      ctx.textAlign = 'center';
+      if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '5px';
+      ctx.fillText(leyenda, 0, iy + alto + (h / 2 - iy - alto) * 0.62);
+      if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
+    }
     if (cinta) {
       ctx.fillStyle = 'rgba(232,181,63,.62)';
       ctx.rotate(-3 * Math.PI / 180);
@@ -820,30 +828,14 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
   }
 
-  /* El corazón en el lienzo: un solo papel, las dos fotos cuadradas tocándose. */
+  /* El corazón en el lienzo: la misma composición que la página. Dos polaroids
+     de ancho w, a ±2° hacia el centro, con el marco de ella montado un 1.2% de
+     w sobre el de Juan (un 20% del margen, así la foto de él no se tapa), y la
+     de ella dibujada la última, encima. */
   function parEnLienzo(ctx, ella, juan, x, y, ancho, sans) {
-    var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw, pie = ancho * 0.11;
-    var h = pad + fh + pie;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(-1.5 * Math.PI / 180);
-    ctx.shadowColor = 'rgba(20,55,80,.28)';
-    ctx.shadowBlur = 40;
-    ctx.shadowOffsetY = 16;
-    ctx.fillStyle = '#fdfcf8';
-    ctx.fillRect(-ancho / 2, -h / 2, ancho, h);
-    ctx.shadowColor = 'transparent';
-    fotoCover(ctx, ella, -ancho / 2 + pad, -h / 2 + pad, fw, fh);
-    fotoCover(ctx, juan, 0, -h / 2 + pad, fw, fh);
-    ctx.font = '600 22px ' + sans;
-    ctx.fillStyle = '#3f5d72';
-    ctx.textAlign = 'center';
-    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '5px';
-    var ly = -h / 2 + pad + fh + pie * 0.62;
-    ctx.fillText('ESPAÑA', -ancho / 2 + pad + fw / 2, ly);
-    ctx.fillText('VENEZUELA', fw / 2, ly);
-    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = '0px';
-    ctx.restore();
+    var w = ancho / 1.988, d = w * 0.988;
+    polaroidEnLienzo(ctx, juan, x + d / 2, y, w, -2, false, 'VENEZUELA', sans);
+    polaroidEnLienzo(ctx, ella, x - d / 2, y, w, 2, false, 'ESPAÑA', sans);
   }
 
   function compartir(r) {

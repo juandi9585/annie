@@ -850,31 +850,31 @@ body {
 .collage--tres .polaroid--mini:nth-of-type(3) { right: -1%; top: 33%; }
 .collage--tres .polaroid--mini:nth-of-type(4) { left: 3%; bottom: 1%; --giro: 5deg; }
 
-/* El corazón partido. Dos medias polaroids cuadradas, como todas las fotos,
-   sin marco en el lado que se tocan, así que
-   al juntarse forman un solo papel y un solo corazón. La sombra va en el
-   conjunto (drop-shadow) para que no se pinte una mitad sobre la otra. */
+/* El corazón: dos polaroids de verdad, cada una con su marco entero, puestas
+   a mano una junto a otra. Se tocan por los marcos: la de ella (encima) se
+   monta sobre el margen izquierdo de la de Juan. Las dos se inclinan 2° hacia
+   el centro, con las partes de arriba acercándose.
+
+   Por qué el solape es sólo un 20% del margen: al inclinarlas hacia dentro, las
+   esquinas de arriba convergen, y la esquina superior derecha del marco de
+   ella es lo primero que invadiría la foto de Juan (donde está su mano). A 2°
+   el máximo sin tapar foto es ~37% del margen; 20% deja aire aun a 320 px.
+   Anchos: 2 × 50.3% − 0.6% = 100% (el 0.6% es el 1.2% del ancho de una). */
 .corazon {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: min(100%, 420px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: min(100%, 400px);
   margin: 2.6rem 0 0;
-  rotate: -1.5deg;
-  filter: drop-shadow(0 14px 18px rgba(20, 55, 80, .2)) drop-shadow(0 3px 5px rgba(20, 55, 80, .12));
 }
 .corazon__mitad {
-  padding: 7% 0 0 7%;
-  background: var(--papel);
+  flex: none;
+  width: 50.3%;
   transition: transform 1300ms var(--salida);
 }
-.corazon__mitad--juan { padding: 7% 7% 0 0; }
-.corazon__foto {
-  aspect-ratio: 1;
-  overflow: hidden;
-  background: var(--pelicula);
-}
-.corazon__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* Su curva abría hacia la izquierda: se voltea para que busque la de Juan. */
+.corazon__mitad--ella { --giro: 2deg; z-index: 2; }
+.corazon__mitad--juan { --giro: -2deg; z-index: 1; margin-left: -.6%; }
 .corazon__lugar {
   display: block;
   padding: .75rem 0 .95rem;
@@ -888,10 +888,10 @@ body {
   color: var(--tinta-suave);
 }
 
-/* Antes de verlo, cada mitad en su orilla; al entrar en pantalla se juntan
-   y el corazón late una vez. */
-.corazon.separado .corazon__mitad       { transform: translateX(-16%) rotate(-5deg); }
-.corazon.separado .corazon__mitad--juan { transform: translateX(16%) rotate(5deg); }
+/* Antes de verlo, cada polaroid en su orilla; al entrar en pantalla llegan
+   desde lados opuestos a su sitio y el corazón late una vez. */
+.corazon.separado .corazon__mitad--ella { transform: translateX(-18%) rotate(-5deg); }
+.corazon.separado .corazon__mitad--juan { transform: translateX(18%) rotate(5deg); }
 .corazon.late { animation: latido 700ms 1050ms ease-out; }
 @keyframes latido {
   0%, 100% { scale: 1; }
@@ -1041,7 +1041,7 @@ body {
     grid-template-areas: "collage titulo" "collage mensaje" "collage ." "corazon corazon" "boton boton" "volver volver" "nota nota";
     grid-template-rows: auto auto 1fr auto auto auto auto;   /* la fila 1fr absorbe lo que el collage mide de más */
   }
-  .tarjeta--par .corazon       { grid-area: corazon; justify-self: center; width: min(100%, 500px); margin-top: 4.5rem; }
+  .tarjeta--par .corazon       { grid-area: corazon; justify-self: center; width: min(100%, 480px); margin-top: 4.5rem; }
   .tarjeta--par #guardar       { justify-self: center; margin-top: 2.6rem; }
   .tarjeta--par .tarjeta__volver { justify-self: center; padding-left: 16px; }
   .tarjeta--par .tarjeta__nota { text-align: center; }
