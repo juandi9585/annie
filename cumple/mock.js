@@ -25,8 +25,8 @@
       instruccion: 'Hazte una foto sonriendo con lo primero que te llegue hoy.' },
     { id: 'm2', titulo: 'La segunda', camara: 'environment',
       instruccion: 'Una foto de lo que acaba de llegar, bien de cerca.' },
-    { id: 'm3', titulo: 'Medio corazón', camara: 'user',
-      instruccion: 'Haz medio corazón con una mano y hazte una selfie con él. La otra mitad la pongo yo.' },
+    { id: 'm3', titulo: 'Medio corazón', camara: 'user', guia: 'mitad',
+      instruccion: 'Haz medio corazón con una mano, justo en la guía de la cámara. La otra mitad la pongo yo.' },
     { id: 'm4', titulo: 'La última', camara: 'environment',
       instruccion: 'Enséñame dónde lo vas a poner.' }
   ];
@@ -51,7 +51,7 @@
     return {
       misiones: MISIONES.map(function (m, i) {
         var h = hechas[m.id];
-        var r = { id: m.id, titulo: m.titulo, instruccion: m.instruccion, camara: m.camara,
+        var r = { id: m.id, titulo: m.titulo, instruccion: m.instruccion, camara: m.camara, guia: m.guia,
                   bloqueada: i > 0 && !hechas.m1, hecha: !!h };
         if (h) { r.foto = h.foto; r.comentario = h.comentario; }
         if (m.id === CORAZON) r.mitad = h ? h.mitad : null;

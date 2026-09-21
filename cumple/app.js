@@ -24,7 +24,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   var params  = new URLSearchParams(location.search);
   var PRUEBA  = params.has('prueba');
   var TIMEOUT_MS = 60000;
-  var LADO_MAX   = 1280;          // lado largo de la foto que se manda
+  var FOTO_W = 960, FOTO_H = 1280; // la foto que se manda: 3:4 vertical, como el visor
   var CALIDAD    = 0.85;          // JPEG
 
   /* Lo que se lee mientras se revela. El backend se despierta en frío y a
@@ -57,6 +57,8 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   var revAcciones = $('revAcciones'), revPrincipal = $('revPrincipal'), revSecundario = $('revSecundario');
   var tarjeta = $('tarjeta'), guardarBtn = $('guardar'), guardarNota = $('guardarNota');
   var guardado = $('guardado');
+  var guia = $('guia');
+  var tarjetaVista = false;        // tras verla una vez, el cierre no se repite
 
   var estado = { misiones: [], final: null };
   var pantalla = 'portada';
@@ -134,9 +136,11 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
 
   function polaroidDeMision(m) {
     var tipo = m.hecha ? 'hecha' : (m.bloqueada ? 'bloqueada' : 'disponible');
-    var p = el(tipo === 'disponible' ? 'button' : 'figure', 'polaroid polaroid--' + tipo);
-    var hueco = el(tipo === 'disponible' ? 'span' : 'div', 'polaroid__hueco');   // un <button> sólo admite contenido en línea
-    var pie = el(tipo === 'disponible' ? 'span' : 'figcaption', 'polaroid__pie');
+    var toca = tipo !== 'bloqueada';    // la hecha también se toca: para repetirla
+    var p = el(toca ? 'button' : 'figure', 'polaroid polaroid--' + tipo);
+    var hueco = el(toca ? 'span' : 'div', 'polaroid__hueco');   // un <button> sólo admite contenido en línea
+    var pie = el(toca ? 'span' : 'figcaption', 'polaroid__pie');
+    if (toca) p.type = 'button';
     p.appendChild(el('span', 'polaroid__cinta'));
     p.appendChild(hueco);
     p.appendChild(pie);
@@ -150,9 +154,10 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         hueco.appendChild(img);
       }
       if (m.comentario) pie.appendChild(el('span', 'polaroid__comentario', m.comentario));
+      pie.appendChild(el('span', 'polaroid__repetir', '¿otra? tócala para repetirla'));
       if (recien === m.id) p.classList.add('recien');
+      p.addEventListener('click', function () { intentos[m.id] = 1; abrirCamara(m); });   // una repetición empieza en 1
     } else if (tipo === 'disponible') {
-      p.type = 'button';
       hueco.appendChild(el('span', 'pista', 'tócala'));
       if (m.instruccion) pie.appendChild(el('span', 'polaroid__nota', m.instruccion));
       p.addEventListener('click', function () { abrirCamara(m); });
@@ -175,6 +180,9 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       tablero.appendChild(li);
     });
     cuenta.textContent = estado.misiones.length ? hechas + ' de ' + estado.misiones.length : '';
+    // Con la tarjeta ya abierta, la promesa se convierte en el camino de vuelta a ella.
+    $('promesa').hidden = !!estado.final;
+    $('verTarjeta').hidden = !estado.final;
   }
 
   /* Lo que ya sabemos en local (la foto recién hecha) gana a un estado que
@@ -199,7 +207,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       fusionar(d.misiones);
       estado.final = d.final || null;
       pintarMisiones();
-      if (estado.final && pantalla === 'portada') abrirTarjeta(false);
+      if (estado.final && !silencioso && pantalla === 'portada') abrirTarjeta(false);
     }, function (e) {
       if (silencioso) return;
       tablero.textContent = '';
@@ -230,6 +238,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   var foto = null;
   var pedido = 0;                  // para descartar una cámara que llega tarde
   var enPausa = false;
+  var guiaActiva = false;
 
   function apagar() {
     pedido++;
@@ -243,6 +252,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     facing = m.camara === 'environment' ? 'environment' : 'user';
     $('camTitulo').textContent = m.titulo || '';
     $('camInstruccion').textContent = m.instruccion || '';
+    guiaActiva = m.guia === 'mitad';
     modoVivo();
     mostrar('camara');
     encender();                     // todavía dentro del toque: iOS lo exige
@@ -260,7 +270,8 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     var n = pedido;
     dispararBtn.disabled = true;
     navigator.mediaDevices.getUserMedia({
-      video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1920 } },
+      // Se pide en vertical, pero el recorte de disparar() funciona venga como venga.
+      video: { facingMode: facing, aspectRatio: { ideal: 3 / 4 }, height: { ideal: 1920 } },
       audio: false
     }).then(function (s) {
       if (n !== pedido || pantalla !== 'camara') { s.getTracks().forEach(function (t) { t.stop(); }); return; }
@@ -328,21 +339,32 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     captura.removeAttribute('src');
     controlesFoto.hidden = true;
     controlesVivo.hidden = false;
+    guia.hidden = !guiaActiva;
+  }
+
+  /* La región del frame que enseña el visor: un 3:4 centrado, con la misma
+     cuenta que object-fit: cover. Si el stream llega apaisado (Android), se
+     queda con la franja vertical del centro; si llega más alto, con la del
+     medio. */
+  function recorte34(w, h) {
+    if (w / h > 3 / 4) { var sw = h * 3 / 4; return { x: (w - sw) / 2, y: 0, w: sw, h: h }; }
+    var sh = w * 4 / 3;
+    return { x: 0, y: (h - sh) / 2, w: w, h: sh };
   }
 
   function disparar() {
     if (!stream || !video.videoWidth) return;
-    var w = video.videoWidth, h = video.videoHeight;
-    var k = Math.min(1, LADO_MAX / Math.max(w, h));
+    var r = recorte34(video.videoWidth, video.videoHeight);
     var c = document.createElement('canvas');
-    c.width = Math.round(w * k);
-    c.height = Math.round(h * k);
+    c.width = Math.min(FOTO_W, Math.round(r.w));
+    c.height = Math.round(c.width * 4 / 3);
     var ctx = c.getContext('2d');
     if (espejo) { ctx.translate(c.width, 0); ctx.scale(-1, 1); }   // lo que ve es lo que se manda
-    ctx.drawImage(video, 0, 0, c.width, c.height);
+    ctx.drawImage(video, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
     foto = c.toDataURL('image/jpeg', CALIDAD);
     captura.src = foto;
     captura.hidden = false;
+    guia.hidden = true;             // la guía no sale en la foto, y tampoco en su vista previa
     controlesVivo.hidden = true;
     controlesFoto.hidden = false;
     if (!reduced) { flash.classList.remove('dispara'); void flash.offsetWidth; flash.classList.add('dispara'); }
@@ -453,6 +475,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
 
   function mandar() {
     var m = mision, f = foto;
+    var repite = !!m.hecha;         // ya tenía una foto aprobada
     var n = intentos[m.id] || 1;
     enviando = true;
     revelado.className = 'revelado';
@@ -470,17 +493,23 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         m.bloqueada = false;
         m.foto = f;
         m.comentario = d.comentario || '';
-        if (Object.prototype.hasOwnProperty.call(d, 'mitad')) m.mitad = d.mitad;   // la del corazón
         recien = m.id;
         if (d.final) estado.final = d.final;
         revelado.className = 'revelado is-listo is-aprobada';
-        revLinea.textContent = d.final ? '¡Las completaste todas!' : '¡Misión cumplida!';
-        acciones(d.final ? 'Abrir tu tarjeta' : 'Seguir', d.final ? function () { abrirTarjeta(true); } : volverAPortada);
+        revLinea.textContent = repite ? '¡Cambiada! Ésta sustituye a la anterior.'
+          : (d.final ? '¡Las completaste todas!' : '¡Misión cumplida!');
+        if (d.final) acciones(tarjetaVista ? 'Ver tu tarjeta' : 'Abrir tu tarjeta', function () { abrirTarjeta(!tarjetaVista); });
+        else acciones('Seguir', volverAPortada);
       } else {
         intentos[m.id] = n + 1;
         revelado.className = 'revelado is-listo is-rechazada';
-        revLinea.textContent = 'Casi. Prueba otra vez.';
-        acciones('Repetir la foto', function () { abrirCamara(m); }, 'Luego', volverAPortada);
+        if (repite) {
+          revLinea.textContent = 'Ésta no pasó, pero tranquila: tu foto anterior sigue guardada.';
+          acciones('Repetir', function () { abrirCamara(m); }, 'Dejar la anterior', volverAPortada);
+        } else {
+          revLinea.textContent = 'Casi. Prueba otra vez.';
+          acciones('Repetir la foto', function () { abrirCamara(m); }, 'Luego', volverAPortada);
+        }
       }
       guardarIntentos();
     }, function (e) {
@@ -533,7 +562,6 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
         if (estado.final && estado.final.mitad === par.juan) { estado.final.mitad = null; abrirTarjeta(false); }
       };
       suya.src = par.juan;
-      corazon.classList.toggle('corazon--espejo', par.ella.mitad === 'izquierda');
       juntarAlVerlo(corazon, conCierre ? 2600 : 300);
     }
 
@@ -558,6 +586,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     preparando.catch(function () {});
 
     var entrar = function () {
+      tarjetaVista = true;
       document.body.classList.remove('cerrando');
       mostrar('tarjeta');
       window.scrollTo(0, 0);
@@ -583,13 +612,14 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   }
 
   /* El par sólo existe si Juan ya subió su mitad (final.mitad) y ella hizo la
-     misión del corazón, que es la que trae la clave `mitad` (no se busca por
-     id). Si falta cualquiera de las dos, la tarjeta es la de siempre. */
+     misión del corazón: la que trae guia: 'mitad' (o, en estados viejos, la
+     clave `mitad`); nunca se busca por id. Si falta cualquiera de las dos, la
+     tarjeta es la de siempre. */
   function parDelCorazon() {
     var f = estado.final;
     if (!f || !f.mitad) return null;
     var ella = estado.misiones.filter(function (m) {
-      return Object.prototype.hasOwnProperty.call(m, 'mitad');
+      return m.guia === 'mitad' || Object.prototype.hasOwnProperty.call(m, 'mitad');
     })[0];
     return ella && ella.hecha && ella.foto ? { ella: ella, juan: f.mitad } : null;
   }
@@ -650,11 +680,12 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
 
     /* Dos composiciones: la de siempre, y con el corazón, donde la órbita
        sube y encoge para dejarle al par la mitad de abajo. */
+    // Las polaroids son 3:4, más altas que anchas: los sitios están medidos para eso.
     var L = par
-      ? { tituloPx: 84, tituloY: 150, tituloPaso: 92, cy: 590, centro: 400, mini: 250,
-          sitios: [[235, 450, -8], [850, 600, 7], [250, 765, 5]], textoTop: 1440, textoTam: 42 }
-      : { tituloPx: 92, tituloY: 210, tituloPaso: 100, cy: 860, centro: 560, mini: 330,
-          sitios: [[250, 560, -8], [835, 590, 7], [245, 1140, 6], [840, 1110, -5]], textoTop: 1330, textoTam: 46 };
+      ? { tituloPx: 84, tituloY: 150, tituloPaso: 92, cy: 590, centro: 400, mini: 230,
+          sitios: [[235, 440, -8], [850, 590, 7], [250, 730, 5]], textoTop: 1440, textoTam: 42 }
+      : { tituloPx: 92, tituloY: 210, tituloPaso: 100, cy: 860, centro: 540, mini: 310,
+          sitios: [[245, 590, -8], [840, 620, 7], [240, 1070, 6], [845, 1050, -5]], textoTop: 1330, textoTam: 46 };
 
     return Promise.all([fuentes, imgs]).then(function (r) {
       var fotos = r[1];
@@ -699,7 +730,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
       polaroidEnLienzo(ctx, fotos[0], cx, cy, L.centro, -2, false);
       if (par) {
         var ps = fotos.slice(1 + orbita.length);
-        parEnLienzo(ctx, ps[0], ps[1], par.ella.mitad === 'izquierda', cx, 1135, 620, SANS);
+        parEnLienzo(ctx, ps[0], ps[1], cx, 1135, 620, SANS);
         ctx.fillStyle = '#21455f';
       }
 
@@ -748,7 +779,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
   }
 
   function polaroidEnLienzo(ctx, img, x, y, w, grados, cinta) {
-    var pad = w * 0.06, lado = w - pad * 2, h = pad + lado + w * (cinta ? 0.16 : 0.2);
+    var pad = w * 0.06, lado = w - pad * 2, alto = lado * 4 / 3, h = pad + alto + w * (cinta ? 0.16 : 0.2);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(grados * Math.PI / 180);
@@ -759,13 +790,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.fillRect(-w / 2, -h / 2, w, h);
     ctx.shadowColor = 'transparent';
     var ix = -w / 2 + pad, iy = -h / 2 + pad;
-    if (img) {
-      var s = Math.min(img.naturalWidth, img.naturalHeight);
-      ctx.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, ix, iy, lado, lado);
-    } else {
-      ctx.fillStyle = '#34495a';
-      ctx.fillRect(ix, iy, lado, lado);
-    }
+    fotoCover(ctx, img, ix, iy, lado, alto);
     if (cinta) {
       ctx.fillStyle = 'rgba(232,181,63,.62)';
       ctx.rotate(-3 * Math.PI / 180);
@@ -774,19 +799,17 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.restore();
   }
 
-  /* Recorta `img` como cover dentro de w×h y, si hace falta, la voltea. */
-  function fotoCover(ctx, img, x, y, w, h, espejo) {
+  /* Recorta `img` como cover dentro de w×h (las fotos viejas, apaisadas,
+     también caben así). */
+  function fotoCover(ctx, img, x, y, w, h) {
     if (!img) { ctx.fillStyle = '#34495a'; ctx.fillRect(x, y, w, h); return; }
     var iw = img.naturalWidth, ih = img.naturalHeight, k = Math.max(w / iw, h / ih);
     var sw = w / k, sh = h / k;
-    ctx.save();
-    if (espejo) { ctx.translate(x + w, y); ctx.scale(-1, 1); x = 0; y = 0; }
     ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
-    ctx.restore();
   }
 
   /* El corazón en el lienzo: un solo papel, las dos fotos 3:4 tocándose. */
-  function parEnLienzo(ctx, ella, juan, espejo, x, y, ancho, sans) {
+  function parEnLienzo(ctx, ella, juan, x, y, ancho, sans) {
     var pad = ancho * 0.035, fw = ancho / 2 - pad, fh = fw * 4 / 3, pie = ancho * 0.09;
     var h = pad + fh + pie;
     ctx.save();
@@ -798,8 +821,8 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     ctx.fillStyle = '#fdfcf8';
     ctx.fillRect(-ancho / 2, -h / 2, ancho, h);
     ctx.shadowColor = 'transparent';
-    fotoCover(ctx, ella, -ancho / 2 + pad, -h / 2 + pad, fw, fh, espejo);
-    fotoCover(ctx, juan, 0, -h / 2 + pad, fw, fh, false);
+    fotoCover(ctx, ella, -ancho / 2 + pad, -h / 2 + pad, fw, fh);
+    fotoCover(ctx, juan, 0, -h / 2 + pad, fw, fh);
     ctx.font = '600 22px ' + sans;
     ctx.fillStyle = '#3f5d72';
     ctx.textAlign = 'center';
@@ -844,6 +867,15 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     }).then(function () { guardarBtn.disabled = false; });
   });
 
+  /* Desde la tarjeta a sus fotos, para repetir alguna; y de vuelta. */
+  $('verFotos').addEventListener('click', function () {
+    mostrar('portada');
+    pintarMisiones();
+    $('misionesTitulo').scrollIntoView({ block: 'start' });
+    $('verTarjeta').focus({ preventScroll: true });
+  });
+  $('verTarjeta').addEventListener('click', function () { abrirTarjeta(false); });
+
   function cerrarGuardado() { guardado.hidden = true; guardarBtn.focus(); }
   $('guardadoCerrar').addEventListener('click', cerrarGuardado);
   document.addEventListener('keydown', function (e) {
@@ -856,6 +888,7 @@ var BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwKWHgcbWi5GdIRaLSPY5
     var reiniciarBtn = $('reiniciar');
     reiniciarBtn.hidden = false;
     reiniciarBtn.addEventListener('click', function () {
+      if (!confirm('¿Reiniciar la prueba? Se borra el progreso de la prueba en esta página. Las fotos siguen en tu Drive y en tu correo.')) return;
       reiniciarBtn.disabled = true;
       llamar({ accion: 'reiniciar' }).then(function () {
         intentos = {};

@@ -17,7 +17,7 @@
 <link rel="preload" href="fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
 <!-- ?v= se sube en cada cambio de CSS o JS: Pages cachea 10 min y un app.js nuevo con un styles.css viejo se rompe. -->
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 
@@ -58,7 +58,8 @@
       <!-- El contador lo escribe app.js; la promesa de debajo es tuya. -->
       <p class="misiones__meta">
         <span class="misiones__cuenta" id="cuenta"></span>
-        <span class="misiones__promesa">al final, tu tarjeta</span>
+        <span class="misiones__promesa" id="promesa">al final, tu tarjeta</span>
+        <button class="misiones__ver" id="verTarjeta" type="button" hidden>ver tu tarjeta</button>
       </p>
     </div>
 
@@ -77,13 +78,26 @@
 <!-- La cámara. Sólo getUserMedia: aquí no hay ningún <input type="file">, a
      propósito, para que no se pueda elegir una foto de la galería. -->
 <section class="camara" id="camara" aria-label="Cámara" hidden>
-  <video class="camara__video" id="video" playsinline muted autoplay></video>
-  <img class="camara__captura" id="captura" alt="La foto que acabas de hacer" hidden>
-  <div class="camara__flash" id="flash" aria-hidden="true"></div>
-
   <div class="camara__arriba">
     <p class="camara__titulo" id="camTitulo"></p>
     <p class="camara__instruccion" id="camInstruccion"></p>
+  </div>
+
+  <!-- El visor es el hueco de una polaroid, 3:4 como todas las fotos de la
+       página: lo que se ve aquí es exactamente lo que se manda. -->
+  <div class="camara__centro">
+    <div class="camara__marco">
+      <div class="camara__visor">
+        <video class="camara__video" id="video" playsinline muted autoplay></video>
+        <img class="camara__captura" id="captura" alt="La foto que acabas de hacer" hidden>
+        <!-- Guía del medio corazón: sólo se dibuja encima, nunca sale en la foto. -->
+        <div class="guia" id="guia" aria-hidden="true" hidden>
+          <svg viewBox="-6 -6 112 184"><path d="M100 38 C 96 12, 62 0, 36 8 C 8 17, -2 55, 16 86 C 34 117, 76 142, 100 168"/></svg>
+          <span class="guia__texto">tu mano aquí</span>
+        </div>
+        <div class="camara__flash" id="flash" aria-hidden="true"></div>
+      </div>
+    </div>
   </div>
 
   <div class="camara__abajo" id="controlesVivo">
@@ -163,6 +177,7 @@
     </div>
   </figure>
   <button class="boton boton--miel" id="guardar" type="button">Guardar tarjeta</button>
+  <button class="tarjeta__volver" id="verFotos" type="button">Ver mis fotos</button>
   <p class="tarjeta__nota" id="guardarNota" role="status"></p>
 </section>
 
@@ -178,6 +193,6 @@
 
 <div class="grano" aria-hidden="true"></div>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

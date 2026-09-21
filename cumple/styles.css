@@ -167,7 +167,7 @@ body {
 
 .polaroid__hueco {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 3 / 4;              /* el formato de toda foto de la página */
   margin: 6% 6% 0;
   overflow: hidden;
   background: var(--pelicula);
@@ -313,6 +313,19 @@ body {
   white-space: nowrap;
 }
 .misiones__cuenta:empty { display: none; }
+.misiones__ver {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 10px 0 10px 12px;
+  margin: -10px 0;
+  font: 600 .82rem/1.3 var(--sans);
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.misiones__ver:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
 .misiones__promesa {
   font-size: .82rem;
   line-height: 1.3;
@@ -394,6 +407,23 @@ body {
   color: var(--tinta-suave);
 }
 .polaroid--hecha .polaroid__comentario { margin-top: .4rem; color: var(--tinta); }
+/* Una hecha también se toca: abre la cámara para repetirla. */
+.polaroid--hecha {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.polaroid--hecha:focus-visible { outline: 3px solid var(--tinta); outline-offset: 4px; }
+.polaroid__repetir {
+  display: block;
+  margin-top: .6rem;
+  font: 500 .72rem/1.3 var(--sans);
+  letter-spacing: .06em;
+  color: var(--tinta-suave);
+}
 
 /* Recién pegada: baja sobre el cielo y la cinta se aplasta encima. */
 .polaroid.recien { animation: pegar 900ms var(--salida) both; }
@@ -457,11 +487,63 @@ body {
   position: fixed;
   inset: 0;
   z-index: 40;
+  display: flex;
+  flex-direction: column;
   background: var(--noche);
   color: var(--papel);
   overflow: hidden;
 }
 
+.camara__arriba {
+  flex: none;
+  padding: max(16px, calc(env(safe-area-inset-top) + 10px)) var(--margen) 14px;
+}
+.camara__titulo {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--sobre-tierra);
+}
+.camara__instruccion {
+  margin: .4rem 0 0;
+  max-width: 32ch;
+  font-family: var(--texto);
+  font-size: clamp(1.05rem, 4.6vw, 1.25rem);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+/* El hueco que queda entre la instrucción y los controles. Es un contenedor
+   de tamaño para que el visor 3:4 quepa entero, mida lo que mida la pantalla. */
+.camara__centro {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 var(--margen);
+  container-type: size;
+}
+/* Papel de polaroid alrededor del visor, con su pie ancho. */
+.camara__marco {
+  padding: 10px 10px 30px;
+  background: var(--papel);
+  border-radius: 2px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+}
+.camara__visor {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: #000;
+  width: min(100%, 52dvh);                                     /* sin container queries */
+  width: min(calc(100cqw - 20px), calc((100cqh - 40px) * .75));
+}
+
+/* Video y captura con la misma caja y el mismo cover centrado: app.js recorta
+   la foto con esa misma cuenta, así que el visor es la foto. */
 .camara__video,
 .camara__captura {
   position: absolute;
@@ -484,44 +566,59 @@ body {
 .camara__flash.dispara { animation: flash 420ms ease-out; }
 @keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
 
-.camara__arriba {
+/* La mitad IZQUIERDA de un corazón, con el lado recto pegado al borde derecho
+   del visor: en la tarjeta, la foto de ella va a la izquierda y ese borde toca
+   la de Juan. Blanco con sombra para leerse sobre cualquier fondo. */
+.guia {
   position: absolute;
-  inset: 0 0 auto;
-  padding: max(18px, calc(env(safe-area-inset-top) + 12px)) var(--margen) 64px;
-  background: linear-gradient(180deg, rgba(14, 28, 39, .82) 0%, rgba(14, 28, 39, .55) 55%, rgba(14, 28, 39, 0) 100%);
+  right: 0;
+  top: 56%;
+  width: 48%;                       /* cabe una mano cerrada en C a distancia de selfie */
+  aspect-ratio: 112 / 184;
+  translate: 0 -50%;
   pointer-events: none;
 }
-.camara__titulo {
-  margin: 0;
+.guia svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .55)) drop-shadow(0 0 6px rgba(0, 0, 0, .3));
+}
+.guia path {
+  fill: rgba(255, 255, 255, .08);
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-dasharray: 9 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.guia__texto {
+  position: absolute;
+  left: 12%;
+  right: 4%;
+  top: 36%;
+  text-align: center;
   font-family: var(--sans);
   font-size: .72rem;
   font-weight: 600;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--sobre-tierra);
-}
-.camara__instruccion {
-  margin: .45rem 0 0;
-  max-width: 30ch;
-  font-family: var(--texto);
-  font-size: clamp(1.12rem, 5vw, 1.35rem);
-  line-height: 1.4;
-  text-wrap: pretty;
+  letter-spacing: .08em;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
 }
 
 .camara__abajo {
-  position: absolute;
-  inset: auto 0 0;
+  flex: none;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   justify-items: center;
-  padding: 48px var(--margen) max(26px, calc(env(safe-area-inset-bottom) + 14px));
-  background: linear-gradient(0deg, rgba(14, 28, 39, .7) 0%, rgba(14, 28, 39, 0) 100%);
+  padding: 16px var(--margen) max(22px, calc(env(safe-area-inset-bottom) + 12px));
 }
 .camara__abajo--foto {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  min-height: 80px;
 }
 .camara__abajo--foto .boton { width: 100%; }
 
@@ -630,7 +727,7 @@ body {
 .polaroid--grande {
   --giro: -1.4deg;
   flex: none;
-  width: min(100%, 400px, 56dvh);
+  width: min(100%, 380px, 44dvh);
   margin: auto 0 0;
 }
 .polaroid--grande .polaroid__pie { min-height: 5.6rem; }
@@ -706,7 +803,7 @@ body {
 .collage {
   position: relative;
   width: min(100%, 440px);
-  aspect-ratio: 1 / 1.08;
+  aspect-ratio: 1 / 1.28;          /* las polaroids son 3:4: más altas que anchas */
   margin: 1.6rem 0 1.2rem;
 }
 .collage__sol {
@@ -773,7 +870,6 @@ body {
 }
 .corazon__foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* Su curva abría hacia la izquierda: se voltea para que busque la de Juan. */
-.corazon--espejo #mitadElla { transform: scaleX(-1); }
 .corazon__lugar {
   display: block;
   padding: .75rem 0 .95rem;
@@ -808,6 +904,19 @@ body {
 .tarjeta__mensaje p + p { margin-top: .8em; }
 
 #guardar { margin-top: 2rem; min-width: 220px; }
+.tarjeta__volver {
+  margin-top: .6rem;
+  padding: 12px 16px;
+  appearance: none;
+  border: 0;
+  background: none;
+  font: 600 .9rem var(--sans);
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.tarjeta__volver:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
 .tarjeta__nota {
   margin: .8rem 0 0;
   min-height: 1.4em;
@@ -905,8 +1014,8 @@ body {
   .tarjeta {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
-    grid-template-areas: "collage titulo" "collage mensaje" "collage boton" "collage nota";
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-areas: "collage titulo" "collage mensaje" "collage boton" "collage volver" "collage nota";
+    grid-template-rows: auto auto auto auto 1fr;
     column-gap: clamp(3rem, 6vw, 5rem);
     align-content: center;
     max-width: 1120px;
@@ -918,16 +1027,18 @@ body {
   .collage          { grid-area: collage; justify-self: center; align-self: center; width: min(100%, 540px); margin: 0; }
   .tarjeta__mensaje { grid-area: mensaje; margin-top: 1.4rem; }
   #guardar          { grid-area: boton; justify-self: start; }
+  .tarjeta__volver  { grid-area: volver; justify-self: start; padding-left: 0; }
   .tarjeta__nota    { grid-area: nota; }
 
   /* Con el corazón, éste es el cierre: ancho completo, debajo de todo, y el
      botón de guardar después de él. */
   .tarjeta--par {
-    grid-template-areas: "collage titulo" "collage mensaje" "collage ." "corazon corazon" "boton boton" "nota nota";
-    grid-template-rows: auto auto 1fr auto auto auto;   /* la fila 1fr absorbe lo que el collage mide de más */
+    grid-template-areas: "collage titulo" "collage mensaje" "collage ." "corazon corazon" "boton boton" "volver volver" "nota nota";
+    grid-template-rows: auto auto 1fr auto auto auto auto;   /* la fila 1fr absorbe lo que el collage mide de más */
   }
   .tarjeta--par .corazon       { grid-area: corazon; justify-self: center; width: min(100%, 500px); margin-top: 4.5rem; }
   .tarjeta--par #guardar       { justify-self: center; margin-top: 2.6rem; }
+  .tarjeta--par .tarjeta__volver { justify-self: center; padding-left: 16px; }
   .tarjeta--par .tarjeta__nota { text-align: center; }
 }
 
