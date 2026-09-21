@@ -257,11 +257,11 @@ body {
   text-wrap: balance;
 }
 
-/* Tres voces en el saludo, cada una con un solo trabajo: el grito (display),
-   la carta (texto, en su voz, más grande que un párrafo) y las reglas (la
-   sans del sistema, pequeña y espaciada, como las pistas de la flor). El
-   ritmo: la carta pegada al grito, las reglas a un paso más, y el tablero
-   bien separado de todo el saludo. */
+/* El saludo son tres cosas: el grito, el aviso (la carta, en su voz y en
+   grande) y la indicación, una frase normal más pequeña y en la tinta del
+   cielo. La jerarquía sale sólo del tamaño y del tono. Ritmo: el aviso
+   pegado al grito, la indicación pegada al aviso (son un mismo mensaje) y
+   el tablero bien separado de todo el saludo. */
 .carta {
   margin: 1.1rem 0 0;
   max-width: 21ch;
@@ -270,54 +270,16 @@ body {
   text-wrap: pretty;
 }
 
-.reglas {
-  list-style: none;
-  margin: 2rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 1.05rem;
-  counter-reset: regla;
-}
-.reglas li {
-  display: grid;
-  grid-template-columns: 1.5rem 1fr;
-  column-gap: .85rem;
-  row-gap: .2rem;
-  counter-increment: regla;
-}
-/* role="list" en el HTML: Safari le quita la semántica de lista a un <ol>
-   con list-style: none, y VoiceOver dejaría de contar los pasos. */
-
-/* El número es el acento: en tinta y en la display, la única cifra con voz
-   de la página. Nunca amarillo: el amarillo es de los regalos. */
-.reglas li::before {
-  content: counter(regla);
-  grid-row: 1 / span 2;
-  font-family: var(--grito);
-  font-weight: 800;
-  font-size: 1.55rem;
-  line-height: .9;
-  font-variant-numeric: lining-nums;
-  color: var(--tinta);
-  text-align: right;
-}
-.reglas__paso {
-  font-family: var(--sans);
-  font-size: .74rem;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: .2em;
-  text-transform: uppercase;
+.indicacion {
+  margin: .9rem 0 0;
+  max-width: 30ch;
+  font-size: clamp(1rem, 4.3vw, 1.1rem);
+  line-height: 1.5;
   color: var(--tinta-cielo);
-}
-.reglas__linea {
-  font-family: var(--sans);
-  font-size: .95rem;
-  line-height: 1.4;
-  color: var(--tinta-cielo);
+  text-wrap: pretty;
 }
 
-.misiones { margin-top: 3.4rem; }
+.misiones { margin-top: 3rem; }
 
 .misiones__cabecera {
   display: flex;
@@ -334,7 +296,7 @@ body {
   font-size: 1.6rem;
   line-height: 1.1;
 }
-/* El contador y, debajo, la promesa de la tarjeta: la misma voz de las reglas. */
+/* El contador y, debajo, la promesa de la tarjeta, en la sans de las pistas. */
 .misiones__meta {
   display: grid;
   justify-items: end;
@@ -932,8 +894,8 @@ body {
      salía de su columna de 25rem. */
   .titulo { font-size: clamp(2.6rem, 4.6vw, 4.1rem); }
   /* En la columna, la jerarquía nueva respira: más aire entre las tres voces. */
-  .carta  { margin-top: 1.5rem; }
-  .reglas { margin-top: 2.6rem; gap: 1.35rem; }
+  .carta      { margin-top: 1.5rem; }
+  .indicacion { margin-top: 1.1rem; }
   .misiones { margin-top: 0; }
   .tablero { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem 2.4rem; }
   .tablero > li,

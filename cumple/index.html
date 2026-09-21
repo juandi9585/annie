@@ -17,7 +17,7 @@
 <link rel="preload" href="fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
 <!-- ?v= se sube en cada cambio de CSS o JS: Pages cachea 10 min y un app.js nuevo con un styles.css viejo se rompe. -->
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
@@ -30,15 +30,13 @@
   <!-- ══════════════════════════════════════════════════════════════════════
        EL MENSAJE.  Es lo único de este archivo que hace falta tocar.
 
-       Tres voces, cada una con su papel:
-       · titulo — el grito. Dos líneas como mucho.
-       · carta  — una o dos frases tuyas, cortas. Es lo único que se lee
-                  como carta: si crece mucho, deja de ser una frase.
-       · reglas — los pasos. Cada <li> lleva un título corto (sale en
-                  mayúsculas pequeñas; escríbelo normal) y una línea que lo
-                  explica. Los números los pone el CSS solos: puedes añadir
-                  o quitar pasos sin tocar nada más.
-       · &nbsp; — espacio que no se parte: úsalo donde te moleste un corte.
+       · titulo     — el grito. Dos líneas como mucho.
+       · carta      — el aviso, en tu voz y en grande. Una frase.
+       · indicacion — lo que tiene que hacer, más pequeño. Una frase.
+       · &nbsp;     — espacio que no se parte: el de antes de la carita
+                      evita que la carita «(:» se quede sola en otra
+                      línea. (Era «c:», pero en Playpen la c se leía
+                      como una letra suelta, no como una sonrisa.)
 
        Las misiones NO van aquí: sus títulos e instrucciones vienen del
        backend, así que se cambian allí.
@@ -46,16 +44,9 @@
 
     <h1 class="titulo">¡Feliz cumpleaños, Annie!</h1>
 
-    <p class="carta">Hoy te van llegando cosas, bebi. Cada una trae una misión.</p>
+    <p class="carta">Hoy te va a llegar algo que te envié&nbsp;(:</p>
 
-    <ol class="reglas" role="list">
-      <li><span class="reglas__paso">Llega algo</span>
-          <span class="reglas__linea">ábrelo: es tuyo</span></li>
-      <li><span class="reglas__paso">Foto en vivo</span>
-          <span class="reglas__linea">aquí mismo, con esta cámara</span></li>
-      <li><span class="reglas__paso">Me llega a mí</span>
-          <span class="reglas__linea">hasta Venezuela</span></li>
-    </ol>
+    <p class="indicacion">Tendrás que tomar en vivo las fotos que te pediré a continuación.</p>
 
   <!-- ═══════════════════════════ fin del mensaje ══════════════════════ -->
 
