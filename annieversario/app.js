@@ -330,8 +330,14 @@
     // la casa del jardín: la de la primera fila más cerca de su sitio, lejos de la iglesia
     const sitio = W * (VERTICAL ? 0.62 : 0.3);
     // ...y donde su rótulo no choque con un nombre de constelación ni con la pista del centro
-    const libre = (k) => !ETIQUETAS.some((e) => k.x + k.w + 40 > e.x0 && k.x - 40 < e.x1 && k.y + 60 > e.y0 && k.y - 50 < e.y1)
-      && Math.abs(k.x + k.w / 2 - W / 2) > 120;
+    // la caja de «Tu jardín» bajo la casa: tiene que caber entera en la pantalla
+    const rotulo = (k) => { const cx = k.x + 13 * ESC; return { x0: cx - 50, x1: cx + 50, y0: k.y - 30 * ESC, y1: k.y + 34 }; };
+    const pisa = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+    const pistaCaja = { x0: W / 2 - 110, x1: W / 2 + 110, y0: H - 70, y1: H };
+    const libre = (k) => {
+      const c = rotulo(k);
+      return c.x0 > 8 && c.x1 < W - 8 && !ETIQUETAS.some((e) => pisa(c, e)) && !pisa(c, pistaCaja);
+    };
     const candidatas = casas.filter((k) => !k.iglesia && k.y < ladera(k.x, 0) + 10 * ESC && Math.abs(k.x - igx) > 70 * ESC && k.x > CIPRES.x + CIPRES.ancho * 0.6)
       .sort((a, b) => Math.abs(a.x - sitio) - Math.abs(b.x - sitio));
     const casa = candidatas.find(libre) || candidatas[0];
