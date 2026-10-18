@@ -71,6 +71,11 @@
   </div>
 </section>
 
+<!-- El sonido: suena con el primer toque; este botón lo silencia. -->
+<button class="sonido" id="sonido" type="button" aria-pressed="true" aria-label="Silenciar el sonido">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="sonido__ondas" d="M15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.6 7.6 0 0 1 0 10.8"/><path class="sonido__tachado" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+</button>
+
 <!-- Telón de las transiciones entre universos (bloques, nubes, fundido). -->
 <div class="telon" id="telon" aria-hidden="true"></div>
 
@@ -103,6 +108,7 @@
 </script>
 <!-- ═══════════════════════════ fin de los universos ════════════════════ -->
 
+<script src="sonido.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

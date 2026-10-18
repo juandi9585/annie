@@ -520,6 +520,39 @@ body[data-abierto="noche"] .cielo { opacity: 0.08; }
 [data-universo="stardew"] .universo__salir { font-size: 1.6rem; line-height: 1; padding: 10px 22px 12px; }
 [data-universo="stardew"] :is(.universo__paso, .universo__salir):hover:not(:disabled) { background: #ffe9b8; }
 
+/* ── el botón del sonido ───────────────────────────────────────────────── */
+.sonido {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 12px);
+  left: calc(env(safe-area-inset-left) + 12px);
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid rgba(251, 231, 161, 0.45);
+  border-radius: 50%;
+  background: rgba(12, 31, 77, 0.5);
+  color: var(--oro-palido);
+  opacity: 0;
+  transition: opacity 0.8s 1.6s ease, background 0.2s ease;
+}
+body.listo .sonido { opacity: 1; }
+.sonido:hover { background: rgba(37, 89, 163, 0.6); }
+.sonido svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sonido[aria-pressed="true"] .sonido__tachado,
+.sonido[aria-pressed="false"] .sonido__ondas { display: none; }
+.sonido[aria-pressed="false"] { opacity: 0.75; }
+
 /* ── el telón entre el cielo y un universo ────────────────────────────── */
 .telon { position: fixed; inset: 0; z-index: 20; pointer-events: none; overflow: hidden; }
 .telon--fundido { background: var(--noche); opacity: 0; transition: opacity 0.22s ease; }

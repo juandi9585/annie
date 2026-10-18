@@ -111,3 +111,8 @@ El cielo, el ciprés, el pueblo, las estrellas y el marco dorado no son
 imágenes: los pinta `app.js` en un canvas, pincelada a pincelada, a partir de
 una semilla. Ningún logotipo ni recurso de los juegos está copiado: cada
 universo imita su estilo con CSS y fuentes libres.
+
+**Sonido** (`annieversario/sonido.js`): no hay ningún archivo de audio. Todo
+—la noche, las campanas de cristal, el piano de Minecraft, la marimba de
+Clash, la cajita de música de Stardew y el acorde del final— se sintetiza en
+el navegador con Web Audio. Ninguna música de los juegos está copiada.

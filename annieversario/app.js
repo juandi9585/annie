@@ -5,6 +5,8 @@
   'use strict';
 
   const DATOS = JSON.parse(document.getElementById('universos').textContent);
+  // el sonido (sonido.js); sin él, todo sigue igual en silencio
+  const S = window.SONIDO || new Proxy({}, { get: () => () => {} });
   const TEMAS = new Set(['minecraft', 'clash', 'stardew']); // el resto: la noche
   const MOVIMIENTO = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   const CLAVE = 'annieversario:vistas';
@@ -109,7 +111,7 @@
     const sep = Math.max(84, paso * 1.9);
     const puestas = [], cajas = [];
     const dentroCipres = (x, y) => x < CIPRES.x + CIPRES.ancho * 0.7 && y > CIPRES.cima - 30;
-    const cercaLuna = (x, y) => Math.hypot(x - LUNA.x, y - LUNA.y) < LUNA.r * 1.9;
+    const cercaLuna = (x, y) => Math.hypot(x - LUNA.x, y - LUNA.y) < LUNA.r * 2.1 + 24 * ESC;
     const choca = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
     const enCaja = (x, y, c) => x > c.x0 - 16 && x < c.x1 + 16 && y > c.y0 - 16 && y < c.y1 + 16;
     // la caja del nombre: centrada bajo la estrella más baja
@@ -657,7 +659,7 @@
       b.className = 'estrella';
       b.style.left = s.x + 'px'; b.style.top = s.y + 'px';
       b.setAttribute('aria-label', `${u.nombre}, foto ${s.ifoto + 1} de ${u.fotos.length}`);
-      b.addEventListener('click', () => abrir(s.iu, s.ifoto, s));
+      b.addEventListener('click', () => { if (!ocupado && !abierto) S.toque(i); abrir(s.iu, s.ifoto, s); });
       b.addEventListener('pointerenter', () => { foco = i; despertar(); if (!MOVIMIENTO) cuadro(0); });
       b.addEventListener('pointerleave', () => { foco = -1; if (!MOVIMIENTO) cuadro(0); });
       b.addEventListener('focus', () => { foco = i; if (!MOVIMIENTO) cuadro(0); });
@@ -752,17 +754,20 @@
       }
       telon.style.setProperty('--fin', ultimo + 'ms');
       telon.append(frag);
+      S.telon('minecraft', 'cubre', ultimo);
       await espera(20);
       telon.classList.add('telon--cubre');
       await espera(ultimo + 260);
     } else if (tema === 'clash') {
       telon.classList.add('telon--nubes');
       telon.innerHTML = '<i class="nube nube--izq"></i><i class="nube nube--der"></i>';
+      S.telon('clash', 'cubre');
       await espera(20);
       telon.classList.add('telon--cubre');
       await espera(1000);
     } else if (tema === 'stardew') {
       telon.classList.add('telon--fundido', 'telon--negro');
+      S.telon('stardew', 'cubre');
       await espera(20);
       telon.classList.add('telon--cubre');
       await espera(720);
@@ -773,8 +778,9 @@
     }
   }
 
-  async function descubrir(tema) {
+  async function descubrir(tema, entrando) {
     if (!telon.classList.contains('telon--cubre')) return;
+    if (MOVIMIENTO || tema !== 'noche') S.telon(tema, entrando ? 'abre' : 'vuelve', parseInt(telon.style.getPropertyValue('--fin'), 10) || 0);
     if (tema === 'minecraft' && MOVIMIENTO) {
       telon.classList.add('telon--abre');
       await espera(parseInt(telon.style.getPropertyValue('--fin'), 10) + 280);
@@ -856,7 +862,9 @@
     dormir(true);
     $('universoSalir').focus({ preventScroll: true });
     universo.classList.add('universo--revela');
-    await descubrir(tema);
+    if (tema === 'noche') S.telon('noche', 'abre');
+    S.fondo(tema);
+    await descubrir(tema, true);
     if (tema === 'noche') await espera(MOVIMIENTO ? 1050 : 0);
     universo.classList.remove('universo--abre');
     ocupado = false;
@@ -871,6 +879,7 @@
       universo.classList.add('universo--sale');
       await espera(tema === 'noche' ? 160 : 300);
     }
+    if (tema === 'noche') S.telon('noche', 'cubre');
     if (tema === 'noche' && MOVIMIENTO) {
       dormir(false);
       universo.style.setProperty('--ox', desde.x + 'px');
@@ -887,10 +896,13 @@
     cielo.inert = false;
     abierto = null;
 
-    const ahora = performance.now();
-    ESTRELLAS.forEach((s) => { if (s.nueva) { encendiendo.set(s.clave, ahora); s.nueva = false; } });
+    const ahora = performance.now(), nuevas = [];
+    ESTRELLAS.forEach((s, i) => { if (s.nueva) { encendiendo.set(s.clave, ahora); s.nueva = false; nuevas.push(i); } });
     actualizar(true);
-    if (tema !== 'noche' || !MOVIMIENTO) await descubrir(tema);
+    S.fondo('noche');
+    S.encender(nuevas);
+    if (nuevas.length && completo()) S.unir();
+    if (tema !== 'noche' || !MOVIMIENTO) await descubrir(tema, false);
     if (desde.boton) desde.boton.focus({ preventScroll: true });
     ocupado = false;
   }
@@ -902,6 +914,7 @@
     ventana.classList.remove('universo__ventana--pasa', 'universo__ventana--vuelve');
     void ventana.offsetWidth;
     ventana.classList.add(d > 0 ? 'universo__ventana--pasa' : 'universo__ventana--vuelve');
+    S.pasar(universo.dataset.universo);
     mostrar(abierto.iu, sig);
   }
 
@@ -953,6 +966,7 @@
     document.documentElement.style.setProperty('--lx', (LUNA.x / W) * 100 + '%');
     document.documentElement.style.setProperty('--ly', (LUNA.y / H) * 100 + '%');
     document.body.classList.add('hacia-la-luna');
+    S.final();
     await espera(MOVIMIENTO ? 1100 : 0);
     final.hidden = false;
     final.scrollTop = 0;
@@ -969,6 +983,7 @@
     ocupado = true;
     dormir(false);
     document.body.classList.remove('al-final', 'hacia-la-luna');
+    S.fondo('noche');
     await espera(MOVIMIENTO ? 900 : 0);
     final.hidden = true;
     cielo.inert = false;
