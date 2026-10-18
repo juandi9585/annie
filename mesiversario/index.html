@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Para Annie</title>
+  <meta property="og:title" content="Para Annie">
+  <meta property="og:description" content="Un regalo, solo para ti.">
+  <meta property="og:url" content="https://juandi9585.github.io/annie/mesiversario/">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/puerta.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== PARTE 1 · El Site «Sorpresa Annie» ===== -->
+  <header class="cabecera">
+    <h1>¿Quieres saber cuánto te amo?</h1>
+  </header>
+  <div class="franja" aria-hidden="true"></div>
+
+  <main class="site">
+    <section class="carrusel" aria-roledescription="carrusel" aria-label="Nuestras fotos">
+      <div class="carrusel__marco">
+        <ul class="carrusel__pista" id="pista" tabindex="0" aria-label="Fotos, desliza hacia los lados">
+          <li class="carrusel__foto"><img src="fotos/foto-1.webp" width="1050" height="1400" alt="Foto de los dos, 1 de 5"></li>
+          <li class="carrusel__foto"><img src="fotos/foto-2.webp" width="1050" height="1400" alt="Foto de los dos, 2 de 5" loading="lazy"></li>
+          <li class="carrusel__foto"><img src="fotos/foto-3.webp" width="1049" height="1400" alt="Foto de los dos, 3 de 5" loading="lazy"></li>
+          <li class="carrusel__foto"><img src="fotos/foto-4.webp" width="1050" height="1400" alt="Foto de los dos, 4 de 5" loading="lazy"></li>
+          <li class="carrusel__foto"><img src="fotos/foto-5.webp" width="1400" height="1050" alt="Foto de los dos, 5 de 5" loading="lazy"></li>
+        </ul>
+        <button type="button" class="carrusel__flecha carrusel__flecha--ant" id="ant" aria-label="Foto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="carrusel__flecha carrusel__flecha--sig" id="sig" aria-label="Foto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="carrusel__puntos" id="puntos"></div>
+    </section>
+
+    <!-- TEXTO DEL SITE: un <p> por línea -->
+    <section class="mensaje">
+      <p>Gracias por estar conmigo estos 6 meses que han sido los mejores de mi vida.</p>
+      <p>Cada día me enorgullece más como trabajas en ti misma y buscas mejorar. Y me inspira profundamente que tú hagas lo mismo conmigo.</p>
+      <p>Tienes un alma preciosa. Te mereces tantas cosas hermosas que espero que consigas, y yo espero estar a tu lado cuando ocurra.</p>
+      <p class="firma">Te adoro bebi &lt;3</p>
+    </section>
+  </main>
+
+  <!-- ===== PARTE 2 · La eShop (Apps Script) ===== -->
+  <section class="eshop" id="eshop">
+    <div class="contenedor-logro" id="escena">
+      <h2 class="titulo-cute">¡Feliz Mesiversario Annie!</h2>
+
+      <button type="button" class="tarjeta-3d" id="miTarjeta" aria-label="Dar la vuelta a la tarjeta" aria-pressed="false">
+        <span class="cara frontal">
+          <img src="fotos/gift-card.webp" width="621" height="900" alt="">
+        </span>
+        <span class="cara trasera">
+          <span class="trasera__titulo">TU CÓDIGO ESHOP</span>
+          <span class="codigo-contenedor">••••-••••-••••-••••</span>
+          <span class="trasera__gracias">¡Disfrútalo mucho!</span>
+          <span class="instrucciones">Toca de nuevo para volver</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- ===== PARTE 3 · La puerta al jardín ===== -->
+    <a class="puerta" href="../">
+      <span class="puerta__brote" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 38V22"/><path class="puerta__hoja" d="M20 30c-6-1-9-4-10-8 5 0 9 2 10 6z"/><path class="puerta__flor" d="M13 12c0 9 14 9 14 0l-3 4-4-8-4 8z"/></svg></span>
+      <span class="puerta__texto"><strong>Ver todo tu jardín</strong><span>Todos tus regalos, en un solo lugar</span></span>
+      <span class="puerta__flecha" aria-hidden="true"></span>
+    </a>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

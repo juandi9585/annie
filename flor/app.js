@@ -486,7 +486,7 @@
     return;
   }
 
-  fetch('assets/flower.json')
+  fetch('../assets/flower.json')
     .then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();

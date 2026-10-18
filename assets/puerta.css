@@ -1,0 +1,70 @@
+/* La puerta al jardín: el cierre común de todos los regalos.
+   Uso, al final de cada regalo (ruta relativa a su carpeta):
+
+   <link rel="stylesheet" href="../assets/puerta.css">
+   <a class="puerta" href="../">
+     <span class="puerta__brote" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 38V22"/><path class="puerta__hoja" d="M20 30c-6-1-9-4-10-8 5 0 9 2 10 6z"/><path class="puerta__flor" d="M13 12c0 9 14 9 14 0l-3 4-4-8-4 8z"/></svg></span>
+     <span class="puerta__texto"><strong>Ver todo tu jardín</strong><span>Todos tus regalos, en un solo lugar</span></span>
+     <span class="puerta__flecha" aria-hidden="true"></span>
+   </a>
+
+   Lleva sus propias fuentes de reserva: no depende de la tipografía del regalo. */
+
+.puerta {
+  --puerta-tinta: #21455f;
+  --puerta-suave: #3d6683;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  width: min(100% - 32px, 380px);
+  margin: 48px auto calc(32px + env(safe-area-inset-bottom));
+  padding: 14px 18px 14px 14px;
+  border-radius: 18px;
+  background: rgba(253, 252, 248, 0.92);
+  box-shadow: 0 10px 30px rgba(33, 69, 95, 0.14);
+  color: var(--puerta-tinta);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.puerta:hover { box-shadow: 0 14px 36px rgba(33, 69, 95, 0.2); }
+.puerta:active { transform: scale(0.98); }
+.puerta:focus-visible { outline: 3px solid var(--puerta-tinta); outline-offset: 3px; }
+
+.puerta__brote {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #c3e0f2 0 58%, #9fd08e 58%);
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+}
+.puerta__brote svg { width: 34px; height: 34px; margin-bottom: 4px; fill: none; stroke: #3f7a3b; stroke-width: 2.4; stroke-linecap: round; }
+.puerta__hoja { fill: #5f9e55; stroke: none; }
+.puerta__flor { fill: #ef9f9a; stroke: none; }
+
+.puerta__texto { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.puerta__texto strong {
+  font: 600 18px/1.2 "Fraunces Display", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+.puerta__texto span {
+  font: 400 13px/1.3 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--puerta-suave);
+}
+
+.puerta__flecha {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-right: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puerta { transition: none; }
+}

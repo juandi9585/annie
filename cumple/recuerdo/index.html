@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para Annie</title>
+
+<!-- Como en el juego: el preview del enlace no cuenta nada. -->
+<meta name="description" content="hoy es tu día.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Para Annie">
+<meta property="og:description" content="hoy es tu día.">
+<meta property="og:url" content="https://juandi9585.github.io/annie/cumple/recuerdo/">
+<meta name="theme-color" content="#a6cfe9">
+
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="preload" href="../fonts/sansita-swashed-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../fonts/playpen-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+<!-- El mundo del juego, tal cual (polaroids, cielo, tarjeta), y lo propio del recuerdo aparte. -->
+<link rel="stylesheet" href="../styles.css?v=10">
+<link rel="stylesheet" href="recuerdo.css">
+<link rel="stylesheet" href="../../assets/puerta.css">
+</head>
+<body>
+
+<div class="cielo" aria-hidden="true"></div>
+
+<main>
+<div class="portada">
+
+  <header class="saludo">
+    <h1 class="titulo">¡Feliz cumpleaños, Annie!</h1>
+    <p class="fecha"><time datetime="2026-09-22">22 de septiembre de 2026</time></p>
+  </header>
+
+  <section class="misiones" aria-labelledby="misionesTitulo">
+    <div class="misiones__cabecera">
+      <h2 class="misiones__titulo" id="misionesTitulo">Tus misiones</h2>
+      <p class="misiones__meta"><span class="misiones__cuenta">4 de 4</span></p>
+    </div>
+
+    <ol class="tablero">
+
+      <li>
+        <!-- «¿Eres tú?» la repitió: la aprobada va delante y las otras dos, detrás, como una pila. -->
+        <div class="pila">
+          <span class="pila__hoja pila__hoja--a" aria-hidden="true"></span>
+          <span class="pila__hoja pila__hoja--b" aria-hidden="true"></span>
+          <button class="polaroid polaroid--hecha pila__frente" id="pilaBoton" type="button">
+            <span class="polaroid__cinta"></span>
+            <span class="polaroid__hueco">
+              <img src="fotos/tu-1.webp" width="720" height="720" alt="Tu foto: ¿Eres tú?" data-hora="22 sep · 13:25">
+              <img src="fotos/tu-2.webp" width="720" height="720" alt="Tu foto: ¿Eres tú?, otro intento" data-hora="22 sep · 11:52" hidden>
+              <img src="fotos/tu-3.webp" width="900" height="1200" alt="Tu foto: ¿Eres tú?, otro intento" data-hora="21 sep · 21:51" hidden>
+            </span>
+            <span class="polaroid__pie">
+              <span class="polaroid__titulo">¿Eres tú?</span>
+              <span class="polaroid__hora" id="pilaHora">22 sep · 13:25</span>
+              <span class="polaroid__repetir" id="pilaCuenta">1 de 3 · tócala para ver otra</span>
+            </span>
+          </button>
+        </div>
+        <p class="visually-hidden" id="pilaAviso" role="status"></p>
+      </li>
+
+      <li>
+        <figure class="polaroid polaroid--hecha polaroid--quieta">
+          <span class="polaroid__cinta"></span>
+          <div class="polaroid__hueco"><img src="fotos/flores.webp" width="720" height="720" alt="Tu foto: Las flores"></div>
+          <figcaption class="polaroid__pie">
+            <span class="polaroid__titulo">Las flores</span>
+            <span class="polaroid__hora">22 sep · 13:26</span>
+          </figcaption>
+        </figure>
+      </li>
+
+      <li>
+        <figure class="polaroid polaroid--hecha polaroid--quieta">
+          <span class="polaroid__cinta"></span>
+          <div class="polaroid__hueco"><img src="fotos/dulce.webp" width="720" height="720" alt="Tu foto: Algo dulce"></div>
+          <figcaption class="polaroid__pie">
+            <span class="polaroid__titulo">Algo dulce</span>
+            <span class="polaroid__hora">22 sep · 13:31</span>
+          </figcaption>
+        </figure>
+      </li>
+
+      <li>
+        <figure class="polaroid polaroid--hecha polaroid--quieta">
+          <span class="polaroid__cinta"></span>
+          <div class="polaroid__hueco"><img src="fotos/corazon.webp" width="720" height="720" alt="Tu foto: Hasta Venezuela"></div>
+          <figcaption class="polaroid__pie">
+            <span class="polaroid__titulo">Hasta Venezuela</span>
+            <span class="polaroid__hora">22 sep · 21:28</span>
+          </figcaption>
+        </figure>
+      </li>
+
+    </ol>
+  </section>
+</div>
+
+<!-- La tarjeta final, como la dejó el juego: la foto de los dos, las polaroids del día alrededor,
+     el mensaje y el corazón entre España y Venezuela. -->
+<section class="tarjeta tarjeta--par" aria-labelledby="tarjetaTitulo">
+  <h2 class="tarjeta__titulo" id="tarjetaTitulo">¡Feliz cumpleaños, Annie!</h2>
+
+  <div class="collage collage--tres">
+    <span class="collage__sol" aria-hidden="true"></span>
+    <figure class="polaroid polaroid--centro">
+      <div class="polaroid__hueco"><img src="fotos/juntos.webp" width="900" height="1200" alt="Juan y Annie juntos"></div>
+    </figure>
+    <figure class="polaroid polaroid--mini">
+      <span class="polaroid__cinta"></span>
+      <div class="polaroid__hueco"><img src="fotos/tu-1.webp" width="720" height="720" alt="Tu foto: ¿Eres tú?"></div>
+    </figure>
+    <figure class="polaroid polaroid--mini">
+      <span class="polaroid__cinta"></span>
+      <div class="polaroid__hueco"><img src="fotos/flores.webp" width="720" height="720" alt="Tu foto: Las flores"></div>
+    </figure>
+    <figure class="polaroid polaroid--mini">
+      <span class="polaroid__cinta"></span>
+      <div class="polaroid__hueco"><img src="fotos/dulce.webp" width="720" height="720" alt="Tu foto: Algo dulce"></div>
+    </figure>
+  </div>
+
+  <div class="tarjeta__mensaje">
+    <p>Espero que sientas que eres una persona súper especial, no solo para mí, sino para muchas otras personas que te rodean y te aman. Eres lo mejor que me ha pasado, y no puedo esperar a volver a verte para decírtelo en persona y darte un abrazo enorme.</p>
+    <p>Te amo &lt;3</p>
+  </div>
+
+  <figure class="corazon" aria-label="Un corazón entre los dos: tu mitad desde España y la de Juan desde Venezuela">
+    <div class="polaroid corazon__mitad corazon__mitad--ella">
+      <div class="polaroid__hueco"><img src="fotos/corazon.webp" width="720" height="720" alt="Tu mitad del corazón"></div>
+      <span class="corazon__lugar">España</span>
+    </div>
+    <div class="polaroid corazon__mitad corazon__mitad--juan">
+      <div class="polaroid__hueco"><img src="fotos/mitad-juan.webp" width="720" height="720" alt="La otra mitad, la de Juan"></div>
+      <span class="corazon__lugar">Venezuela</span>
+    </div>
+  </figure>
+</section>
+
+<a class="puerta" href="../../">
+  <span class="puerta__brote" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 38V22"/><path class="puerta__hoja" d="M20 30c-6-1-9-4-10-8 5 0 9 2 10 6z"/><path class="puerta__flor" d="M13 12c0 9 14 9 14 0l-3 4-4-8-4 8z"/></svg></span>
+  <span class="puerta__texto"><strong>Ver todo tu jardín</strong><span>Todos tus regalos, en un solo lugar</span></span>
+  <span class="puerta__flecha" aria-hidden="true"></span>
+</a>
+</main>
+
+<div class="grano" aria-hidden="true"></div>
+
+<script>
+/* La pila de «¿Eres tú?»: cada toque trae la siguiente foto al frente. */
+(function () {
+  var boton = document.getElementById('pilaBoton');
+  var fotos = boton.querySelectorAll('.polaroid__hueco img');
+  var hora = document.getElementById('pilaHora');
+  var cuenta = document.getElementById('pilaCuenta');
+  var aviso = document.getElementById('pilaAviso');
+  var i = 0;
+  boton.addEventListener('click', function () {
+    fotos[i].hidden = true;
+    i = (i + 1) % fotos.length;
+    fotos[i].hidden = false;
+    fotos[i].classList.remove('llega');
+    void fotos[i].offsetWidth;            // reinicia la animación
+    fotos[i].classList.add('llega');
+    hora.textContent = fotos[i].getAttribute('data-hora');
+    cuenta.textContent = (i + 1) + ' de ' + fotos.length + ' · tócala para ver otra';
+    aviso.textContent = 'Foto ' + (i + 1) + ' de ' + fotos.length + ', ' + hora.textContent;
+  });
+})();
+</script>
+</body>
+</html>

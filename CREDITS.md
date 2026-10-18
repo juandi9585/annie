@@ -68,3 +68,24 @@ Cada corte va en dos archivos con su `unicode-range`:
 Están servidos desde el propio dominio, como `lottie.min.js`. La `pista`
 ("tócala") va en la sans del sistema a propósito: contrasta con la serif y no
 cuesta ni una petición.
+
+## Tipografía del Mesiversario — `assets/fonts/`
+
+Vendorizadas desde Google Fonts (woff2, subconjuntos latin y latin-ext, cada
+par con su `unicode-range`), usadas solo por `mesiversario/`:
+
+| Familia | Archivos | Autoría | Licencia |
+|---|---|---|---|
+| **Lato** 700 | `lato-700*.woff2` | Łukasz Dziedzic | SIL OFL 1.1 |
+| **Roboto** 400 cursiva | `roboto-400-italic*.woff2` | Google (Christian Robertson) | Apache 2.0 |
+| **Pacifico** 400 | `pacifico-400*.woff2` | Vernon Adams, Jacques Le Bailly, Botjo Nikoltchev | SIL OFL 1.1 |
+| **Quicksand** 500/700 | `quicksand-500-700*.woff2` | Andrew Paglinawan | SIL OFL 1.1 |
+
+Texto de las licencias: <https://openfontlicense.org> (OFL) y
+<https://www.apache.org/licenses/LICENSE-2.0> (Apache 2.0). Los `.woff2` se
+descargaron tal cual los sirve Google Fonts.
+
+## Fotos del Mesiversario — `mesiversario/fotos/`
+
+Nuestras. Salen de `tools/fotos-mesiversario.py`: WebP, orientación corregida y
+**sin metadatos** (sin GPS). Los originales no están en `web/`.
