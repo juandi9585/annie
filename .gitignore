@@ -6,3 +6,6 @@ Desktop.ini
 # de aquí y escribe las versiones publicables (sin metadatos) en assets/fotos/.
 assets/fotos-originales/
 .claude/
+
+# Capturas de la revisión de diseño: llevan fotos y no hacen falta en el repo.
+.impeccable/review/

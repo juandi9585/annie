@@ -89,3 +89,25 @@ descargaron tal cual los sirve Google Fonts.
 
 Nuestras. Salen de `tools/fotos-mesiversario.py`: WebP, orientación corregida y
 **sin metadatos** (sin GPS). Los originales no están en `web/`.
+
+## Annieversario — `annieversario/`
+
+**Tipografía** (`annieversario/fonts/`), vendorizada desde Google Fonts como
+subconjunto latin en woff2; cada una con su licencia al lado:
+
+| Familia | Archivo | Autoría | Licencia |
+|---|---|---|---|
+| **Caveat Brush** | `caveat-brush.woff2` | © Google Inc. (diseño de Impallari Type) | SIL OFL 1.1 |
+| **Pixelify Sans** | `pixelify-sans.woff2` | © The Pixelify Sans Project Authors (Stefie Justprince) | SIL OFL 1.1 |
+| **Jersey 15** | `jersey-15.woff2` | © The Soft Type Project Authors (Sarah Cadigan-Fried) | SIL OFL 1.1 |
+| **Lilita One** | `lilita-one.woff2` | © Juan Montoreano | SIL OFL 1.1 |
+
+**Fotos** (`annieversario/fotos/`): nuestras, y capturas nuestras de
+Minecraft, Clash of Clans, Stardew Valley y Sky: Children of the Light. Salen
+de `tools/fotos-annieversario.py`: WebP, **sin metadatos**; las de pixel art,
+sin pérdida. Los originales están en `code/annie/aniversario/imagenes/`.
+
+El cielo, el ciprés, el pueblo, las estrellas y el marco dorado no son
+imágenes: los pinta `app.js` en un canvas, pincelada a pincelada, a partir de
+una semilla. Ningún logotipo ni recurso de los juegos está copiado: cada
+universo imita su estilo con CSS y fuentes libres.

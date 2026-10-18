@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Together in every universe</title>
+
+<!-- El preview del enlace (WhatsApp, el QR) no cuenta nada del regalo. -->
+<meta name="description" content="Para Annie.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Together in every universe">
+<meta property="og:description" content="Para Annie.">
+<meta property="og:url" content="https://juandi9585.github.io/annie/annieversario/">
+<meta name="theme-color" content="#0c1f4d">
+
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/caveat-brush.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/puerta.css">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<!-- El cuadro: lo pinta app.js, pincelada a pincelada. -->
+<canvas class="cuadro" id="cuadro" aria-hidden="true"></canvas>
+
+<main class="cielo" id="cielo">
+  <h1 class="titulo" id="titulo">Together in every universe</h1>
+
+  <!-- Las constelaciones: una estrella por foto, una constelación por universo. -->
+  <svg class="trazos" id="trazos" aria-hidden="true"></svg>
+  <div class="estrellas" id="estrellas"></div>
+
+  <button class="luna" id="luna" type="button" aria-label="La luna" aria-disabled="true"></button>
+
+  <!-- La casa del pueblo con flores en la puerta: la vuelta al jardín. -->
+  <a class="jardin" id="jardin" href="../"><span>Tu jardín</span></a>
+
+  <p class="pista" id="pista" aria-live="polite">Toca una estrella</p>
+</main>
+
+<!-- Un universo abierto. Su aspecto cambia según el juego (data-universo). -->
+<div class="universo" id="universo" role="dialog" aria-modal="true" aria-labelledby="universoNombre" hidden>
+  <div class="universo__fondo" aria-hidden="true"></div>
+  <div class="universo__marco">
+    <p class="universo__nombre" id="universoNombre"></p>
+    <div class="universo__ventana" id="universoVentana">
+      <img class="universo__foto" id="universoFoto" alt="">
+    </div>
+    <div class="universo__pie">
+      <button class="universo__paso" id="universoAntes" type="button" aria-label="Foto anterior"><span aria-hidden="true"></span></button>
+      <p class="universo__cuenta" id="universoCuenta"></p>
+      <button class="universo__paso universo__paso--sig" id="universoDespues" type="button" aria-label="Foto siguiente"><span aria-hidden="true"></span></button>
+    </div>
+    <button class="universo__salir" id="universoSalir" type="button"><span>Volver al cielo</span></button>
+  </div>
+</div>
+
+<!-- El cierre: el cielo se abre y estáis dentro del cuadro. -->
+<section class="final" id="final" hidden aria-labelledby="finalTitulo">
+  <img class="final__foto" id="finalFoto" alt="Los dos, dentro de La noche estrellada">
+  <div class="final__texto">
+    <h2 class="final__titulo" id="finalTitulo">Feliz Annieversario</h2>
+    <div class="final__fin">
+      <button class="final__volver" id="finalVolver" type="button">Volver a las estrellas</button>
+      <a class="puerta" href="../">
+        <span class="puerta__brote" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M20 38V22"/><path class="puerta__hoja" d="M20 30c-6-1-9-4-10-8 5 0 9 2 10 6z"/><path class="puerta__flor" d="M13 12c0 9 14 9 14 0l-3 4-4-8-4 8z"/></svg></span>
+        <span class="puerta__texto"><strong>Ver todo tu jardín</strong><span>Todos tus regalos, en un solo lugar</span></span>
+        <span class="puerta__flecha" aria-hidden="true"></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Telón de las transiciones entre universos (bloques, nubes, fundido). -->
+<div class="telon" id="telon" aria-hidden="true"></div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     LOS UNIVERSOS.  Lo único que hay que tocar.
+
+     Cada universo es una constelación; cada foto, una estrella.
+       id       minecraft · clash · stardew · sky · juntos
+                (decide el aspecto al abrirlo; uno desconocido se queda en
+                La noche estrellada, como sky y juntos)
+       nombre   lo que se lee junto a la constelación y al abrirla
+       fotos    archivos de fotos/, en el orden en que se ven
+
+     cierre     la foto del final, la que aparece al tocar la luna.
+
+     Para fotos nuevas: déjalas en code/annie/aniversario/imagenes/ y corre
+     python tools/fotos-annieversario.py  (dice el nombre de cada salida).
+     ════════════════════════════════════════════════════════════════════ -->
+<script type="application/json" id="universos">
+{
+  "universos": [
+    { "id": "minecraft", "nombre": "Minecraft",      "fotos": ["minecraft-1.webp", "minecraft-2.webp"] },
+    { "id": "clash",     "nombre": "Clash of Clans", "fotos": ["clash-1.webp"] },
+    { "id": "stardew",   "nombre": "Stardew Valley", "fotos": ["stardew-1.webp"] },
+    { "id": "sky",       "nombre": "Sky: Children of the Light", "fotos": ["sky-1.webp", "sky-3.webp", "sky-4.webp"] },
+    { "id": "juntos",    "nombre": "Este universo",  "fotos": ["juntos-1.webp", "juntos-2.webp", "juntos-3.webp"] }
+  ],
+  "cierre": "sky-2.webp"
+}
+</script>
+<!-- ═══════════════════════════ fin de los universos ════════════════════ -->
+
+<script src="app.js"></script>
+</body>
+</html>

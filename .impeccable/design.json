@@ -1,0 +1,377 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T12:00:00Z",
+  "title": "Design System: Annie (regalos) · annieversario",
+  "scope": "Solo annieversario/. Los mundos de los demás regalos (jardín raíz, flor/, mesiversario/, cumple/) aún no están documentados.",
+  "extensions": {
+    "colorMeta": {
+      "noche": {
+        "role": "neutral",
+        "displayName": "Noche",
+        "tonalRamp": [
+          "#0a1b45",
+          "#0f285d",
+          "#163874",
+          "#1d4a8e",
+          "#2559a3",
+          "#3f7fbd",
+          "#7cb0d6",
+          "#cbe0dc"
+        ]
+      },
+      "noche-honda": {
+        "role": "neutral",
+        "displayName": "Noche honda"
+      },
+      "oro": {
+        "role": "primary",
+        "displayName": "Oro cromo",
+        "tonalRamp": [
+          "#e8922a",
+          "#f0a530",
+          "#f4cf4a",
+          "#f6d04a",
+          "#f7dc6f",
+          "#f9e07a",
+          "#fae38a",
+          "#fffbe6"
+        ]
+      },
+      "oro-palido": {
+        "role": "primary",
+        "displayName": "Oro pálido"
+      },
+      "cobalto": {
+        "role": "secondary",
+        "displayName": "Cobalto",
+        "tonalRamp": [
+          "#0a1b45",
+          "#0f285d",
+          "#163874",
+          "#1d4a8e",
+          "#2559a3",
+          "#2f6bb2",
+          "#5a95c9",
+          "#a3c9de"
+        ]
+      },
+      "bruma": {
+        "role": "neutral",
+        "displayName": "Bruma"
+      },
+      "marco-oro": {
+        "role": "secondary",
+        "displayName": "Oro de marco",
+        "tonalRamp": [
+          "#3d2a0b",
+          "#4a300b",
+          "#5e3f10",
+          "#8a5f1c",
+          "#a8741f",
+          "#b98a33",
+          "#e7b93a",
+          "#fbe9a6"
+        ]
+      },
+      "mc-tooltip": {
+        "role": "skin-minecraft",
+        "displayName": "Tooltip morado",
+        "canonical": "rgba(16, 0, 16, 0.94)"
+      },
+      "mc-tooltip-borde": {
+        "role": "skin-minecraft",
+        "displayName": "Violeta de tooltip"
+      },
+      "mc-panel": {
+        "role": "skin-minecraft",
+        "displayName": "Gris de inventario"
+      },
+      "mc-sombra-texto": {
+        "role": "skin-minecraft",
+        "displayName": "Sombra de texto"
+      },
+      "clash-pergamino": {
+        "role": "skin-clash",
+        "displayName": "Pergamino"
+      },
+      "clash-tinta": {
+        "role": "skin-clash",
+        "displayName": "Tinta de contorno"
+      },
+      "clash-madera": {
+        "role": "skin-clash",
+        "displayName": "Madera"
+      },
+      "clash-verde": {
+        "role": "skin-clash",
+        "displayName": "Verde de botón"
+      },
+      "clash-rojo": {
+        "role": "skin-clash",
+        "displayName": "Rojo de cerrar"
+      },
+      "stardew-papel": {
+        "role": "skin-stardew",
+        "displayName": "Papel de diálogo"
+      },
+      "stardew-boton": {
+        "role": "skin-stardew",
+        "displayName": "Crema de botón"
+      },
+      "stardew-tinta": {
+        "role": "skin-stardew",
+        "displayName": "Madera oscura"
+      },
+      "stardew-naranja": {
+        "role": "skin-stardew",
+        "displayName": "Filo naranja"
+      },
+      "luz-ventana": {
+        "role": "secondary",
+        "displayName": "Luz de ventana",
+        "tonalRamp": [
+          "#f0b737",
+          "#f4c542",
+          "#f7d35a"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Título del cielo; entra pintándose."
+      },
+      "display-final": {
+        "displayName": "Display final",
+        "purpose": "Feliz Annieversario en el cierre."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Nombre del universo en la piel de noche."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Pista y contador."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nombres de constelación (se parten a partir de 150px) y botón de volver."
+      },
+      "minecraft-title": {
+        "displayName": "Minecraft",
+        "purpose": "Tooltip de nombre en la piel Minecraft."
+      },
+      "clash-title": {
+        "displayName": "Clash",
+        "purpose": "Cabecera de madera, con contorno de 5px."
+      },
+      "stardew-title": {
+        "displayName": "Stardew",
+        "purpose": "Pestaña de nombre de la caja de diálogo."
+      }
+    },
+    "shadows": [
+      {
+        "name": "halo-titulo",
+        "value": "0 2px 0 rgba(8, 22, 58, 0.45), 0 8px 28px rgba(8, 22, 58, 0.7)",
+        "purpose": "text-shadow que sostiene el texto sobre el lienzo."
+      },
+      {
+        "name": "marco-museo",
+        "value": "0 24px 50px rgba(3, 10, 30, 0.6), 0 4px 10px rgba(3, 10, 30, 0.4)",
+        "purpose": "Ventana de foto en la piel de noche."
+      },
+      {
+        "name": "resplandor-constelacion",
+        "value": "drop-shadow(0 0 4px rgba(247, 220, 111, 0.75))",
+        "purpose": "filter de trazos encendidos."
+      },
+      {
+        "name": "boton-clash",
+        "value": "inset 0 3px 0 rgba(255, 255, 255, 0.5), 0 4px 0 #2a1a08",
+        "purpose": "Solo piel Clash; se hunde 3px al pulsar."
+      },
+      {
+        "name": "boton-piedra",
+        "value": "inset 3px 3px 0 rgba(255, 255, 255, 0.38), inset -3px -4px 0 rgba(0, 0, 0, 0.45)",
+        "purpose": "Solo piel Minecraft."
+      }
+    ],
+    "motion": [
+      {
+        "name": "curva",
+        "value": "cubic-bezier(0.7, 0, 0.2, 1)",
+        "purpose": "Curva de firma: zoom a la luna, pintado de títulos, trazado de constelaciones."
+      },
+      {
+        "name": "apertura-noche",
+        "value": "clip-path 1.05s cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Círculo que crece desde la estrella tocada; cierra en 0.9s."
+      },
+      {
+        "name": "marco-entra",
+        "value": "0.9s 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Contenido de la noche: sube 26px y escala de 0.96. Minecraft lo usa en 0.45s."
+      },
+      {
+        "name": "marco-rebota",
+        "value": "0.65s 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Clash: el panel salta desde scale(0.55)."
+      },
+      {
+        "name": "marco-sube",
+        "value": "0.75s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Stardew: la caja sube 44px."
+      },
+      {
+        "name": "marco-sale",
+        "value": "0.3s ease-in",
+        "purpose": "Salida común: baja 12px y se desvanece."
+      },
+      {
+        "name": "bloques-ola",
+        "value": "opacity 0.16s + transform 0.26s cubic-bezier(0.3, 1.5, 0.5, 1), retraso = distancia × 34ms",
+        "purpose": "Minecraft: bloques que se colocan en ola desde la estrella tocada."
+      },
+      {
+        "name": "telon-nubes",
+        "value": "0.95s cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Entrada a Clash."
+      },
+      {
+        "name": "telon-negro",
+        "value": "opacity 0.7s cubic-bezier(0.45, 0, 0.55, 1)",
+        "purpose": "Entrada a Stardew."
+      },
+      {
+        "name": "pasa-foto",
+        "value": "0.42s cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Cambio de foto: 28px de deslizamiento con fundido."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition-duration: 0.01ms",
+        "purpose": "Todo el movimiento se apaga; el telón pasa a fundido."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "apaisado",
+        "value": "(min-aspect-ratio: 1/1)"
+      },
+      {
+        "name": "final-ancho",
+        "value": "(min-aspect-ratio: 4/3)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón de noche",
+      "kind": "button",
+      "refersTo": "boton-noche",
+      "description": "Volver al cielo / a las estrellas: píldora de vidrio de noche con filo de oro.",
+      "html": "<button class=\"ds-boton-noche\">Volver al cielo</button>",
+      "css": ".ds-boton-noche { min-height: 48px; padding: 10px 22px; border: 2px solid rgba(251, 231, 161, 0.55); border-radius: 999px; background: rgba(12, 31, 77, 0.55); color: #fbe7a1; font: 1.35rem \"Caveat Brush\", \"Segoe Print\", cursive; cursor: pointer; transition: background 0.2s ease; } .ds-boton-noche:hover { background: rgba(37, 89, 163, 0.6); } .ds-boton-noche:focus-visible { outline: 3px solid #fbe7a1; outline-offset: 3px; }"
+    },
+    {
+      "name": "Paso de noche",
+      "kind": "button",
+      "refersTo": "paso-noche",
+      "description": "Foto anterior/siguiente: círculo de 52px con chevron de bordes CSS.",
+      "html": "<button class=\"ds-paso-noche\" aria-label=\"Foto siguiente\"><span></span></button>",
+      "css": ".ds-paso-noche { position: relative; width: 52px; height: 52px; padding: 0; border: 2px solid rgba(251, 231, 161, 0.55); border-radius: 50%; background: rgba(12, 31, 77, 0.55); color: #fbe7a1; cursor: pointer; } .ds-paso-noche span { position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; border: solid currentColor; border-width: 0 0 3px 3px; transform: translate(-70%, -50%) rotate(-135deg); } .ds-paso-noche:hover { background: rgba(37, 89, 163, 0.6); } .ds-paso-noche:focus-visible { outline: 3px solid #fbe7a1; outline-offset: 3px; }"
+    },
+    {
+      "name": "Casa del jardín",
+      "kind": "custom",
+      "refersTo": "enlace-jardin",
+      "description": "Enlace al jardín sobre la casa encendida del pueblo, con etiqueta \"Tu jardín\".",
+      "html": "<div class=\"ds-pueblo\"><a class=\"ds-jardin\" href=\"#\"><span>Tu jardín</span></a></div>",
+      "css": ".ds-pueblo { position: relative; height: 110px; background: #0c1f4d; } .ds-jardin { position: absolute; left: 50%; top: 20px; width: 56px; height: 52px; margin-left: -28px; border-radius: 14px; color: #fbe7a1; text-decoration: none; } .ds-jardin span { position: absolute; top: 100%; left: 50%; margin-top: 4px; transform: translateX(-50%); white-space: nowrap; font: 1.2rem/1 \"Caveat Brush\", \"Segoe Print\", cursive; text-shadow: 0 1px 2px #08163a, 0 2px 6px rgba(8, 22, 58, 0.95), 0 0 14px rgba(8, 22, 58, 0.95); transition: color 0.3s ease; } .ds-jardin::before { content: \"\"; position: absolute; inset: 4px; border-radius: 50%; background: radial-gradient(circle, rgba(247, 211, 90, 0.4), rgba(247, 211, 90, 0) 70%); opacity: 0; transition: opacity 0.4s ease; } .ds-jardin:is(:hover, :focus-visible)::before { opacity: 1; } .ds-jardin:is(:hover, :focus-visible) span { color: #fff6d8; } .ds-jardin:focus-visible { outline: 3px solid #fbe7a1; outline-offset: 2px; }"
+    },
+    {
+      "name": "Constelación",
+      "kind": "custom",
+      "description": "Nombre de constelación sobre el lienzo: pincel con halo, se parte a 150px, pasa a oro al visitarla.",
+      "html": "<div class=\"ds-cielo\"><span class=\"ds-constelacion\">Minecraft</span> <span class=\"ds-constelacion ds-constelacion--vista\">Sky</span></div>",
+      "css": ".ds-cielo { padding: 24px; background: #0c1f4d; display: flex; gap: 24px; } .ds-constelacion { max-width: 150px; text-align: center; text-wrap: balance; font: 1.35rem/1.05 \"Caveat Brush\", \"Segoe Print\", cursive; color: #e6eef7; text-shadow: 0 1px 2px #08163a, 0 2px 6px rgba(8, 22, 58, 0.95), 0 0 16px rgba(8, 22, 58, 0.95); transition: color 0.8s ease; } .ds-constelacion--vista { color: #f7dc6f; }"
+    },
+    {
+      "name": "Botón de piedra (Minecraft)",
+      "kind": "button",
+      "refersTo": "boton-minecraft",
+      "description": "Solo en la piel Minecraft.",
+      "html": "<button class=\"ds-boton-piedra\">Volver al cielo</button>",
+      "css": ".ds-boton-piedra { min-height: 48px; padding: 10px 26px; border: 3px solid #000; background: #6f6f6f; box-shadow: inset 3px 3px 0 rgba(255, 255, 255, 0.38), inset -3px -4px 0 rgba(0, 0, 0, 0.45); color: #fff; font: 1.25rem \"Pixelify Sans\", monospace; text-shadow: 3px 3px 0 #3f3f3f; cursor: pointer; } .ds-boton-piedra:hover, .ds-boton-piedra:focus-visible { border-color: #fff; outline: none; background-color: #7d88c8; }"
+    },
+    {
+      "name": "Paso de Clash",
+      "kind": "button",
+      "refersTo": "paso-clash",
+      "description": "Solo en la piel Clash: botón verde con sombra dura que se hunde al pulsar.",
+      "html": "<button class=\"ds-paso-clash\" aria-label=\"Foto siguiente\"></button>",
+      "css": ".ds-paso-clash { width: 52px; height: 52px; border: 3px solid #2a1a08; border-radius: 14px; background: linear-gradient(#b5ea6a, #6cb52f 55%, #4f9a20); box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), 0 4px 0 #2a1a08; cursor: pointer; } .ds-paso-clash:active { transform: translateY(3px); box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), 0 1px 0 #2a1a08; } .ds-paso-clash:focus-visible { outline: 3px solid #fbe7a1; outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón de Stardew",
+      "kind": "button",
+      "refersTo": "boton-stardew",
+      "description": "Solo en la piel Stardew: crema con filo naranja y madera oscura.",
+      "html": "<button class=\"ds-boton-stardew\">Volver al cielo</button>",
+      "css": ".ds-boton-stardew { min-height: 48px; padding: 10px 22px 12px; border: 4px solid #3b1a0a; border-radius: 4px; background: #f9dca0; box-shadow: inset 0 0 0 3px #e48a33; color: #3b1a0a; font: 1.6rem/1 \"Jersey 15\", monospace; cursor: pointer; } .ds-boton-stardew:hover { background: #ffe9b8; } .ds-boton-stardew:focus-visible { outline: 3px solid #fbe7a1; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La noche estrellada como mapa",
+    "overview": "Un solo cuadro vivo a pantalla completa: un lienzo <canvas> pintado pincelada a pincelada con un campo de flujo de remolinos, en la paleta de Van Gogh (azul de Prusia, cobalto, cerúleo, amarillo cromo, blanco), con ciprés y pueblo en silueta; en el pueblo, una casa elegida se pinta más grande, con ventanas y puerta encendidas y flores delante, y es el enlace al jardín. Sobre él, todo el texto es pincel (Caveat Brush) en oro pálido, y las constelaciones son trazos punteados de bruma que se vuelven oro continuo al visitarlas. No hay tarjetas, rejillas ni chrome de interfaz en el cielo: solo el título, las estrellas, la luna, la casa del jardín y una pista.\n\nEl sistema tiene dos capas. La noche es la piel por defecto: rige el cielo, el cierre y cualquier universo sin piel propia (hoy \"Sky: Children of the Light\" y \"Este universo\"). Las pieles de juego (Minecraft, Clash of Clans, Stardew Valley) sustituyen por completo el idioma visual al abrir su universo: tipografía, materiales, bordes, sombras y transición de entrada son los nativos de cada juego. Una piel no mezcla su gramática con la noche ni con otra piel.",
+    "keyCharacteristics": [
+      "Un lienzo pintado como único fondo; la interfaz flota sobre él sin superficies propias.",
+      "Texto en pincel, oro pálido sobre azul noche, legibilidad sostenida por halos de sombra azul oscuro, no por cajas.",
+      "Cada universo de juego es una piel completa y nativa, seleccionada por data-universo.",
+      "Movimiento con una sola curva de firma (--curva), y apagado entero bajo prefers-reduced-motion."
+    ],
+    "rules": [
+      {
+        "name": "The Una Sola Luz Rule",
+        "body": "En la noche, el oro es la única luz. Lo no visitado es bruma; lo visitado y el texto son oro. No se introduce un segundo acento.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paleta Cerrada Rule",
+        "body": "Los colores de una piel de juego viven solo bajo su [data-universo]. Nunca aparecen en el cielo, en el cierre ni en otra piel.",
+        "section": "colors"
+      },
+      {
+        "name": "The Un Solo Pincel Rule",
+        "body": "En la noche no hay otra familia ni otro peso que Caveat Brush 400. La jerarquía se hace con tamaño, nunca con peso.",
+        "section": "typography"
+      },
+      {
+        "name": "The Halo, No Caja Rule",
+        "body": "El texto sobre el lienzo se sostiene con sombras de texto en noche-honda, nunca con un panel detrás.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sombra Nativa Rule",
+        "body": "Una sombra dura o desplazada solo existe donde el juego que se imita la usa (Clash, Minecraft). La noche nunca la usa.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar --curva (cubic-bezier(0.7, 0, 0.2, 1)) para todo movimiento de la noche.",
+      "Do mantener cada piel encerrada en su selector [data-universo=\"…\"], y dejar que cualquier universo nuevo sin piel caiga en la noche.",
+      "Do dibujar los iconos con CSS o SVG (chevrons de borde, X de dos barras), con aria-label en el botón.",
+      "Do interrumpir los trazos de constelación bajo los nombres; ninguna línea cruza texto.",
+      "Do que los enlaces del cielo vivan dentro del cuadro (la casa del jardín), no como botones superpuestos.",
+      "Do dar a cada control un objetivo de al menos 48px y un :focus-visible visible.",
+      "Do apagar animaciones y transiciones bajo prefers-reduced-motion (el telón pasa a un fundido corto)."
+    ],
+    "donts": [
+      "Don't poner paneles, tarjetas o rejillas sobre el cielo; el texto se sostiene con halos.",
+      "Don't usar en la noche las sombras duras, contornos de texto o fuentes pixeladas de las pieles.",
+      "Don't añadir una segunda familia o un segundo peso a la noche.",
+      "Don't mezclar materiales entre pieles (piedra de Minecraft en Clash, madera de Stardew en la noche)."
+    ]
+  }
+}
