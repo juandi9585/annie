@@ -16,7 +16,9 @@
 <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/caveat-brush.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../assets/puerta.css">
-<link rel="stylesheet" href="estilo.css">
+<!-- ?v=: súbelo al cambiar estilo.css, sonido.js o app.js, para que ningún
+     teléfono mezcle archivos nuevos con otros viejos de su caché. -->
+<link rel="stylesheet" href="estilo.css?v=7">
 </head>
 <body>
 
@@ -108,7 +110,7 @@
 </script>
 <!-- ═══════════════════════════ fin de los universos ════════════════════ -->
 
-<script src="sonido.js"></script>
-<script src="app.js"></script>
+<script src="sonido.js?v=7"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>
